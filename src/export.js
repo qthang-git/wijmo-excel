@@ -53,7 +53,8 @@ export class ExportService {
     }
     _formatWorksheet(flex) {
         this._ws = this._wb.sheets;
-        this._ws[0].name = flex.SheetName + '_テスト仕様書';
+        const SheetExcelName = 'テスト仕様書';
+        this._ws[0].name = flex.SheetName != '' ? flex.SheetName + '_' + SheetExcelName : SheetExcelName;
         this._wscolumns = this._ws[0].columns;
         this._wsrows = this._ws[0].rows;
         // disable freeze row & column
