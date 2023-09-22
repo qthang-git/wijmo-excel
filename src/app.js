@@ -19,6 +19,9 @@ class App {
         const btnExportToExcel = document.getElementById('btnExportToExcel');
         this._excelExportContext = new ExcelExportContext(btnExportToExcel);
         btnExportToExcel.addEventListener('click', () => {
+            this._theGrid.countTestCase = this._theGrid.itemsSource.sourceCollection.filter(item => item.status != 0).length;
+            this._theGrid.FileName = $('#file-name').val();
+            this._theGrid.SheetName = $('#sheet-name').val();
             this._exportToExcel();
         });
         // initializes the grid
@@ -177,7 +180,6 @@ class App {
                 if (e.row == 0) {
                     e.cell.style.textAlign = 'center';
                 }
-                s.countTestCase = s.itemsSource.sourceCollection.filter(item => item.status != 0).length;
             }
             if (e.panel == s.rowHeaders) {
                 const _id = e.row;
