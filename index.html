@@ -6,7 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>FlexGrid Overview</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link id="favicon" rel="shortcut icon" href="https://d3ki9tyy5l5ruj.cloudfront.net/obj/df5bcec7e9873dddebdd1328901c287f0f069750/asana-logo-favicon@3x.png">
+    <link id="favicon" rel="shortcut icon"
+        href="https://d3ki9tyy5l5ruj.cloudfront.net/obj/df5bcec7e9873dddebdd1328901c287f0f069750/asana-logo-favicon@3x.png">
     <!-- SystemJS -->
     <script src="node_modules/systemjs/dist/system.src.js"></script>
     <script src="systemjs.config.js"></script>
@@ -17,6 +18,21 @@
 
 <body>
     <div class="container-fluid">
+        <br>
+        <div class="row div-center w800">
+            <div class="toolbar-item col-sm-6 col-md-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Enter file name" aria-describedby="file-name">
+                    <span class="input-group-addon" id="file-name">.xlsx</span>
+                </div>
+            </div>
+            <div class="toolbar-item col-sm-6 col-md-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Enter sheet name" aria-describedby="sheet-name">
+                    <span class="input-group-addon" id="sheet-name">_テスト仕様書</span>
+                </div>
+            </div>
+        </div>
         <br>
         <!-- the grid -->
         <div class="row div-center w800">
