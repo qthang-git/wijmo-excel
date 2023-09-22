@@ -1,0 +1,14 @@
+:root {
+    --width-center: 800px
+}
+.w800{
+    max-width: var(--width-center);
+    min-width: var(--width-center);
+}
+.div-center{
+    margin: 0 auto;
+    text-align: center;
+}
+#theGrid {
+    height: 500px;
+}

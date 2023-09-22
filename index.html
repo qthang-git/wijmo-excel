@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>FlexGrid Overview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link id="favicon" rel="shortcut icon" href="https://d3ki9tyy5l5ruj.cloudfront.net/obj/df5bcec7e9873dddebdd1328901c287f0f069750/asana-logo-favicon@3x.png">
+    <!-- SystemJS -->
+    <script src="node_modules/systemjs/dist/system.src.js"></script>
+    <script src="systemjs.config.js"></script>
+    <script>
+        System.import('./src/app');
+    </script>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <br>
+        <!-- the grid -->
+        <div class="row div-center w800">
+            <div class="col-sm-12 col-md-12">
+                <div id="theGrid"></div>
+            </div>
+        </div>
+        <br>
+        <div class="row div-center w800">
+            <!-- export to Excel -->
+            <div class="toolbar-item col-sm-4 col-md-3">
+                <button id="btnExportToExcel" class="btn btn-default btn-block">Export To Excel</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
