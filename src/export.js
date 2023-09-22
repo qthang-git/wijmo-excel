@@ -3,7 +3,7 @@ import * as wjcGrid from '@grapecity/wijmo.grid';
 import * as wjcGridXlsx from '@grapecity/wijmo.grid.xlsx';
 import * as wjcXlsx from '@grapecity/wijmo.xlsx';
 //
-const ExcelExportDocName = 'FlexGrid.xlsx';
+const ExcelExportDocName = 'TEMPLATE-DEFAULT.xlsx';
 //
 export class ExportService {
     constructor() {
@@ -19,6 +19,7 @@ export class ExportService {
         ctx.exporting = false;
         ctx.progress = 0;
         ctx.preparing = true;
+        const ExcelDocName = flex.FileName == '' ? ExcelExportDocName : flex.FileName + '.xlsx';
         this._wb = wjcGridXlsx.FlexGridXlsxConverter.saveAsync(flex, {
             includeColumnHeaders: true,
             includeStyles: false,
@@ -27,7 +28,7 @@ export class ExportService {
         })
         this._formatWorksheet(flex);
         // return;
-        this._wb.saveAsync(ExcelExportDocName, () => {
+        this._wb.saveAsync(ExcelDocName, () => {
             console.log('Export to Excel completed');
             this._resetExcelContext(ctx);
         }, err => {
@@ -52,7 +53,7 @@ export class ExportService {
     }
     _formatWorksheet(flex) {
         this._ws = this._wb.sheets;
-        this._ws[0].name = 'Tong quan';
+        this._ws[0].name = flex.SheetName + '_テスト仕様書';
         this._wscolumns = this._ws[0].columns;
         this._wsrows = this._ws[0].rows;
         // disable freeze row & column
