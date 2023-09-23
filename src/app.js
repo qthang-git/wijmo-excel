@@ -19,14 +19,16 @@ class App {
         const btnExportToExcel = document.getElementById('btnExportToExcel');
         this._excelExportContext = new ExcelExportContext(btnExportToExcel);
         btnExportToExcel.addEventListener('click', () => {
-            this._theGrid.countTestCase = this._theGrid.itemsSource.sourceCollection.filter(item => item.status != 0).length;
-            this._theGrid.FileName = $('#file-name').val();
-            this._theGrid.SheetName = $('#sheet-name').val();
+            this._theGrid.worksheet_count = this._theGrid.itemsSource.sourceCollection.filter(item => item.status != 0).length;
+            this._theGrid.xlsx_name = $('#file-name').val();
+            this._theGrid.worksheet_name = $('#sheet-name').val();
             this._exportToExcel();
         });
         // initializes the grid
         this._initializeGrid();
         this._formatItem();
+        // initializes handle event
+        this._handlerEvent();
         // initializes items source
         this._itemsSource = this._createItemsSource();
         this._theGrid.itemsSource = this._itemsSource;
@@ -34,6 +36,64 @@ class App {
     close() {
         const ctx = this._excelExportContext;
         this._exportSvc.cancelExcelExport(ctx);
+    }
+    _handlerEvent() {
+        // hande field text #sheet-name
+        const sheetNameExcel = document.getElementById('sheet-name');
+        sheetNameExcel.addEventListener('change', (event) => {
+            if ($(event.target).val().length > 15) {
+                alert('Sheet name exceeds 15 characters');
+                $(event.target).val('');
+                $(event.target).focus();
+            }
+        });
+        // handle clear button  
+        const btnClearAll = document.getElementById('clear-all');
+        btnClearAll.addEventListener('click', () => {
+            let result = confirm('Delete everything (contains data in the list)');
+            if (result) {
+                $('#file-name').val('');
+                $('#sheet-name').val('');
+                let itemsSource = this._theGrid.itemsSource.sourceCollection;
+                let len = itemsSource.length;
+                for (let i = 0; i < len; i++) {
+                    itemsSource[i].operation = '';
+                    itemsSource[i].checklist = '';
+                }
+                this._theGrid.select(-1, -1);
+                this._theGrid.itemsSource.refresh();
+            }
+        });
+        // handle sort 
+        const btnMoveUp = document.getElementById('upwards');
+        btnMoveUp.addEventListener('click', () => {
+            let source = this._theGrid.itemsSource.sourceCollection;
+            let selectedRow = this._theGrid.selectedRows;
+            let index = selectedRow[0].index;
+            selectedRow.isSelected = false;
+            if (index > 1) {
+                let item = source.splice(index, 1)[0];
+                source.splice(index - 1, 0, item);
+                this._theGrid.rows[index].isSelected = true;
+                this._theGrid.collectionView.currentPosition = index - 1;
+            }
+            this._updateIndex(1, true);
+        });
+        const btnMoveDown = document.getElementById('downwards');
+        btnMoveDown.addEventListener('click', () => {
+            let source = this._theGrid.itemsSource.sourceCollection;
+            let selectedRow = this._theGrid.selectedRows;
+            let index = selectedRow[0].index;
+            selectedRow.isSelected = false;
+            if (index >= 1) {
+                let item = source.splice(index, 1)[0];
+                source.splice(index + 1, 0, item);
+                this._theGrid.rows[index].isSelected = true;
+                this._theGrid.collectionView.currentPosition = index + 1;
+            }
+            this._updateIndex(1, true);
+        });
+
     }
     _initializeGrid() {
         // creates columns
@@ -98,59 +158,62 @@ class App {
             autoRowHeights: true,
             autoGenerateColumns: false,
             showMarquee: true,
-            columns: this._columns
+            columns: this._columns,
+            selectionMode: 'ListBox'
         });
         this._theGrid.select(-1, -1);
     }
+    // add new row in FlexGrid
     _addRow(index) {
         const data = this._itemsSource.sourceCollection;
         const obj = {};
         obj.json = data;
         obj.json.splice(index + 1, 0, {
             no: index + 1,
-            testcase: '',
-            result: '',
+            operation: '',
+            checklist: '',
             status: 1
         });
-        for (var i = index + 1; i < obj.json.length; i++) {
-            obj.json[i].no = i + 1;
-        }
         this._theGrid.itemsSource.sourceCollection = obj.json;
-        this._theGrid.select(-1, -1);
-        this._theGrid.itemsSource.refresh();
+        this._updateIndex(index);
     }
+    // delete selected row in FlexGrid
     _delRow(index) {
         const data = this._itemsSource.sourceCollection;
         const rowcount = data.length;
         const obj = {};
         obj.json = data;
-        if (rowcount > 1) {
+        if (rowcount > 2) {
             obj.json.splice(index, 1);
-            for (var i = index; i < obj.json.length; i++) {
-                obj.json[i].no = i + 1;
-            }
             this._theGrid.itemsSource.sourceCollection = obj.json;
-            this._theGrid.select(-1, -1);
-            this._theGrid.itemsSource.refresh();
+            this._updateIndex(index);
         }
     }
+    // copy selected row in FlexGrid
     _copyRow(index) {
         const data = this._itemsSource.sourceCollection;
         const obj = {};
         obj.json = data;
         obj.json.splice(index + 1, 0, {
             no: index + 1,
-            testcase: obj.json[index].testcase,
-            result: obj.json[index].result,
+            operation: obj.json[index].operation,
+            checklist: obj.json[index].checklist,
             status: obj.json[index].status
         });
-        for (var i = index + 1; i < obj.json.length; i++) {
-            obj.json[i].no = i + 1;
-        }
         this._theGrid.itemsSource.sourceCollection = obj.json;
-        this._theGrid.select(-1, -1);
+        this._updateIndex(index);
+    }
+    // update index row in FlexGrid 
+    _updateIndex(index = 1, isSort = false) {
+        let source = this._theGrid.itemsSource.sourceCollection;
+        let len = source.length;
+        for (var i = index; i < len; i++) {
+            source[i].no = i;
+        }
+        !isSort && this._theGrid.select(-1, -1);
         this._theGrid.itemsSource.refresh();
     }
+    // export excel
     _exportToExcel() {
         const ctx = this._excelExportContext;
         if (!ctx.exporting) {
@@ -161,12 +224,12 @@ class App {
             this._exportSvc.cancelExcelExport(ctx);
         }
     }
-    _customizeGridForExcel() {
-        // remove 3 columns contains button add/del/copy
-        let columns = this._theGrid.columns;
-        let columnsCount = columns.length;
-        columns.splice(columnsCount - 3, 3);
-    }
+    // _customizeGridForExcel() {
+    //     // remove 3 columns contains button add/del/copy
+    //     let columns = this._theGrid.columns;
+    //     let columnsCount = columns.length;
+    //     columns.splice(columnsCount - 3, 3);
+    // }
     _createItemsSource() {
         const data = this._dataSvc.getData(5);
         const view = new wjcCore.CollectionView(data);
@@ -176,11 +239,13 @@ class App {
     }
     _formatItem() {
         this._theGrid.formatItem.addHandler(function (s, e) {
+            // handle column header
             if (e.panel == s.columnHeaders) {
                 if (e.row == 0) {
                     e.cell.style.textAlign = 'center';
                 }
             }
+            // handle row header
             if (e.panel == s.rowHeaders) {
                 const _id = e.row;
                 const data = s.itemsSource.sourceCollection;
@@ -194,10 +259,17 @@ class App {
                     item.status = event.target.checked ? 0 : 1;
                     let index = event.target.checked ? _id + 1 : _id;
                     for (var i = index; i < data.length; i++) {
-                        data[i].no = event.target.checked ? i : i + 1;
+                        data[i].no = event.target.checked ? i - 1 : i;
                     }
                     s.refresh();
                 });
+            }
+            // handle cell
+            if (e.panel == s.cells) {
+                // remove [action button] in first row 
+                if (e.row == 0 && (e.col == 9 || e.col == 10 || e.col == 11)) {
+                    e.cell.innerHTML = '';
+                }
             }
         });
     }

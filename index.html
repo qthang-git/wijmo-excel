@@ -20,24 +20,44 @@
     <div class="container-fluid">
         <br>
         <div class="row div-center w800">
-            <div class="toolbar-item col-sm-6 col-md-6">
+            <div class="toolbar-item col-sm-5 col-md-5">
                 <div class="input-group">
-                    <input id="file-name" type="text" class="form-control" placeholder="Enter file name" aria-describedby="span-file-name">
+                    <input id="file-name" type="text" class="form-control" placeholder="Enter file name"
+                        aria-describedby="span-file-name">
                     <span class="input-group-addon" id="span-file-name">.xlsx</span>
                 </div>
             </div>
-            <div class="toolbar-item col-sm-6 col-md-6">
+            <div class="toolbar-item col-sm-5 col-md-5">
                 <div class="input-group">
-                    <input id="sheet-name" type="text" class="form-control" placeholder="Enter sheet name" aria-describedby="sspan-heet-name">
+                    <input id="sheet-name" type="text" class="form-control" placeholder="Enter sheet name"
+                        aria-describedby="sspan-heet-name" maxlength="15">
                     <span class="input-group-addon" id="span-sheet-name">_テスト仕様書</span>
                 </div>
+                <div class="input-group">
+                    <span id="notice">(Maximum 15 characters)
+                    </span>
+                </div>
+            </div>
+            <div class="toolbar-item col-sm-2 col-md-2">
+                <button id="clear-all" class="btn btn-primary float-right">Clear All</button>
+
             </div>
         </div>
         <br>
         <!-- the grid -->
         <div class="row div-center w800">
-            <div class="col-sm-12 col-md-12">
+            <div class="col-sm-11 col-md-11">
                 <div id="theGrid"></div>
+            </div>
+            <div class="col-sm-1 col-md-1">
+                <div class="banner-sort">
+                    <div>
+                        <img class="btn-sort" id="upwards" idth="50" height="50"
+                            src="https://img.icons8.com/ios/50/circled-chevron-up.png" alt="circled-chevron-up" />
+                        <img class="btn-sort" id="downwards" width="50" height="50"
+                            src="https://img.icons8.com/ios/50/circled-chevron-down.png" alt="circled-chevron-down" />
+                    </div>
+                </div>
             </div>
         </div>
         <br>

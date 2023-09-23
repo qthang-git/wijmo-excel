@@ -1,14 +1,38 @@
 :root {
     --width-center: 800px
 }
-.w800{
+
+.w800 {
     max-width: var(--width-center);
     min-width: var(--width-center);
 }
-.div-center{
+
+.div-center {
     margin: 0 auto;
     text-align: center;
 }
+
 #theGrid {
     height: 500px;
+}
+
+.banner-sort {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner-sort img {
+    cursor: pointer;
+}
+
+#notice {
+    text-align: left;
+    color: grey;
+    font-style: italic;
+    font-size: 12px;
+}
+
+.float-right{
+    float: right;
 }
