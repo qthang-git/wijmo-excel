@@ -16,6 +16,7 @@ export class ExportService {
         this._excelExportDocName = ExcelExportDocName;
         this._ws_font_family = 'Meiryo UI';
         this._arr_wsname = [];
+        this._arr_wsindex = [];
     }
     startExcelExport(flex, ctx) {
         if (ctx.preparing || ctx.exporting) {
@@ -62,8 +63,10 @@ export class ExportService {
     }
     _createOtherWSName(flex) {
         this._arr_wsname = [];
+        this._arr_wsindex = [];
         for (let i = 1; i <= this._wscount; i++) {
             this._arr_wsname.push('エビデンス（No ' + i + '. ' + flex.worksheet_name + '）');
+            this._arr_wsindex.push(i);
         }
     }
     _formatItemExcel(e) {
@@ -158,17 +161,20 @@ export class ExportService {
                         }
                     }
                     if (i > 1 && j == 1) {
-                        if (previous_cell.value == '' || previous_cell.value == "'") {
-                            idxFomula = 0;
-                        }
                         if (cell.value != '' && cell.value != "'") {
                             style.format = 'General';
+                            style.font.underline = true;
+                            style.font.color = '#4F81BD';
                             if (i != 2) {
-                                cell.formula = '=OFFSET(INDIRECT(ADDRESS(ROW()' + '-' + idxFomula + ',COLUMN())), -1, 0)+1';
+                                let minus_row = idxFomula != 0 ? ('-' + idxFomula) : '';
+                                cell.formula = '=OFFSET(INDIRECT(ADDRESS(ROW()' + minus_row + ',COLUMN())), -1, 0)+1';
                             }
-                            cell.link = "#'" + this._arr_wsname[i - 2] + "'!B1";
+                            cell.link = "#'" + this._arr_wsname[cell.value - 1] + "'!B1";
+                            if (previous_cell.value == '' || previous_cell.value == "'") {
+                                idxFomula = 0;
+                            }
                         } else {
-                            idxFomula++;
+                            idxFomula += 1;
                         }
                     }
                 }
@@ -230,7 +236,7 @@ export class ExportService {
             }
         }
         this._wsrows[4].cells[3].formula = '="総数「" & MAX(C5:C49653) & "」　OK「" & COUNTIF(J5:J49653,"OK") & "」　NG「" & COUNTIF(J5:J49653,"NG") & "」　未「" & MAX(C5:C49653)-(COUNTIF(J5:J49653,"OK")+COUNTIF(J5:J49653,"NG")) & "」　進捗「" & ROUND((COUNTIF(J5:J49653,"OK")+COUNTIF(J5:J49653,"NG"))/MAX(C5:C49653)*100,1) & "%」"';
-        this._addNewWorkSheet();
+        this._addNewWorkSheet(flex);
     }
     _newEmptyCell() {
         let cellEmpty = new wjcXlsx.WorkbookCell();
@@ -286,10 +292,10 @@ export class ExportService {
         }
         return worksheet;
     }
-    _addNewWorkSheet() {
+    _addNewWorkSheet(flex) {
         for (let i = 1; i <= this._wscount; i++) {
             let sheetname = this._arr_wsname[i - 1];
-            let hyperlink_cell = (i + 7);
+            let hyperlink_cell = flex.itemsSource.items.findIndex(item => item.no == this._arr_wsindex[i - 1]) + 7;
             let worksheet = this._createContentForWS(this._newEmptyWorkSheet(sheetname), hyperlink_cell)
             this._ws.push(worksheet);
         }

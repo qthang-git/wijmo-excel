@@ -179,7 +179,7 @@ class App {
             status: 1
         });
         this._itemsSource.sourceCollection = obj.json;
-        this._updateIndex(index);
+        this._updateIndex();
     }
     // delete selected row in FlexGrid
     _delRow(index) {
@@ -190,7 +190,7 @@ class App {
         if (rowcount > 2) {
             obj.json.splice(index, 1);
             this._itemsSource.sourceCollection = obj.json;
-            this._updateIndex(index);
+            this._updateIndex();
         }
     }
     // copy selected row in FlexGrid
@@ -211,9 +211,11 @@ class App {
     _updateIndex(index = 1, isSort = false) {
         let source = this._itemsSource.sourceCollection;
         let len = source.length;
+        let idx = 1;
         for (var i = index; i < len; i++) {
             if (source[i].status != 0) {
-                source[i].no = i;
+                source[i].no = idx;
+                idx++;
             }
         }
         !isSort && this._theGrid.select(-1, -1);
@@ -263,10 +265,11 @@ class App {
                 $('#chk_' + _id).off('click').on('click', function (event) {
                     item.no = '';
                     item.status = event.target.checked ? 0 : 1;
-                    let index = event.target.checked ? _id + 1 : _id;
-                    for (var i = index; i < data.length; i++) {
-                        if (data[i].status != 1) {
-                            data[i].no = event.target.checked ? i - 1 : i;
+                    let index = 1;
+                    for (var i = 1; i < data.length; i++) {
+                        if (data[i].status != 0) {
+                            data[i].no = index;
+                            index++;
                         }
                     }
                     s.refresh();
