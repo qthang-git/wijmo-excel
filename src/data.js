@@ -11,6 +11,7 @@ export class DataService {
         this._verifier = '';
         this._result = '';
         this._notes = '';
+        this.group = '';
         this._status = 1;
     }
     getData(count) {
@@ -34,6 +35,7 @@ export class DataService {
             verifier: this._verifier,
             result: this._result,
             notes: this._notes,
+            group: '',
             status: index == 0 ? 0 : this._status
         }
         return item;

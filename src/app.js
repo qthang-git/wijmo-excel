@@ -15,11 +15,14 @@ class App {
         this._lastId = 5;
         this._dataSvc = dataSvc;
         this._exportSvc = exportSvc;
+        this._objGroup = {};
         // initializes export
         const btnExportToExcel = document.getElementById('btnExportToExcel');
         this._excelExportContext = new ExcelExportContext(btnExportToExcel);
         btnExportToExcel.addEventListener('click', () => {
-            this._theGrid.worksheet_count = this._itemsSource.sourceCollection.filter(item => item.status != 0).length;
+            const arrTestCase = this._itemsSource.sourceCollection.filter(item => item.status != 0);
+            this._theGrid.worksheet_count = arrTestCase.length;
+            this._theGrid.worksheet_index = arrTestCase.map(arr => arr.no);
             this._theGrid.xlsx_name = $('#file-name').val();
             this._theGrid.worksheet_name = $('#sheet-name').val();
             this._exportToExcel();
@@ -111,6 +114,7 @@ class App {
             { binding: 'verifier', header: '検証者', width: 50, visible: false, dataType: "String", align: "left" },
             { binding: 'result', header: '結果', width: 50, visible: false, dataType: "String", align: "left" },
             { binding: 'notes', header: '備考', width: 50, visible: false, dataType: "String", align: "left" },
+            { binding: 'group', header: 'グループ', width: 70/*, isReadOnly: true*/, dataType: "String", align: "left" },
             {
                 binding: 'btn-add', header: ' ', width: 30, minWidth: 30, maxWidth: 30,
                 cellTemplate: CellMaker.makeLink({
@@ -165,6 +169,7 @@ class App {
             selectionMode: 'ListBox',
             allowSorting: false
         });
+        this._theGrid._objGroup = {};
         this._theGrid.select(-1, -1);
     }
     // add new row in FlexGrid
@@ -247,6 +252,9 @@ class App {
     }
     _formatItem() {
         this._theGrid.formatItem.addHandler(function (s, e) {
+            const _id = e.row;
+            const data = s.itemsSource.sourceCollection;
+            let item = data[_id];
             // handle column header
             if (e.panel == s.columnHeaders) {
                 if (e.row == 0) {
@@ -255,9 +263,6 @@ class App {
             }
             // handle row header
             if (e.panel == s.rowHeaders) {
-                const _id = e.row;
-                const data = s.itemsSource.sourceCollection;
-                let item = data[_id];
                 e.cell.innerHTML = '<input class="row-checkbox" id="chk_' + _id + '" type="checkbox" ' + (item.status != 1 ? 'checked' : '') + '>';
                 if (e.row == 0 && e.col == 0) {
                     e.cell.classList.add('wj-state-disabled');
@@ -277,9 +282,19 @@ class App {
             }
             // handle cell
             if (e.panel == s.cells) {
-                // remove [action button] in first row 
-                if (e.row == 0 && (e.col == 9 || e.col == 10 || e.col == 11)) {
+                // remove [action button] if status is 0
+                if (item.status == 0 && (e.col == 10 || e.col == 11 || e.col == 12)) {
                     e.cell.innerHTML = '';
+                }
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i].status != 0 && data[i].group != '') {
+                        s._objGroup['Group' + data[i].group] = [];
+                    }
+                }
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i].status != 0 && data[i].group != '') {
+                        s._objGroup['Group' + data[i].group].push(data[i].no);
+                    }
                 }
             }
         });

@@ -17,6 +17,7 @@ export class ExportService {
         this._ws_font_family = 'Meiryo UI';
         this._arr_wsname = [];
         this._arr_wsindex = [];
+        this._objGroup = {};
     }
     startExcelExport(flex, ctx) {
         if (ctx.preparing || ctx.exporting) {
@@ -32,6 +33,8 @@ export class ExportService {
             this._wsname = flex.worksheet_name + '_' + this._wsname;
         }
         this._wscount = flex.worksheet_count;
+        this._arr_wsindex = flex.worksheet_index;
+        this._objGroup = flex._objGroup;
         this._createOtherWSName(flex);
         this._wb = wjcGridXlsx.FlexGridXlsxConverter.saveAsync(flex, {
             includeColumnHeaders: true,
@@ -62,12 +65,27 @@ export class ExportService {
         });
     }
     _createOtherWSName(flex) {
-        this._arr_wsname = [];
-        this._arr_wsindex = [];
-        for (let i = 1; i <= this._wscount; i++) {
-            this._arr_wsname.push('エビデンス（No ' + i + '. ' + flex.worksheet_name + '）');
-            this._arr_wsindex.push(i);
+        let arr_wsname = [];
+        let keys = Object.keys(this._objGroup);
+        for (let i = 0; i < this._arr_wsindex.length; i++) {
+            let sheetChildNo = this._arr_wsindex[i];
+            if (keys.length != 0) {
+                for (let j = 0; j < keys.length; j++) {
+                    let Group = this._objGroup[keys[j]];
+                    if (Group.findIndex(gr => gr == sheetChildNo) != -1) {
+                        let fromSheet = Group[0];
+                        let toSheet = Group[Group.length - 1];
+                        if (fromSheet != toSheet) {
+                            sheetChildNo = fromSheet + "~" + toSheet;
+                            break;
+                        }
+                    }
+                }
+            }
+            let sheetChildName = 'エビデンス（No ' + sheetChildNo + '. ' + flex.worksheet_name + '）';
+            arr_wsname.push(sheetChildName);
         }
+        this._arr_wsname = [...new Set(arr_wsname)];
     }
     _formatItemExcel(e) {
     }
@@ -293,9 +311,9 @@ export class ExportService {
         return worksheet;
     }
     _addNewWorkSheet(flex) {
-        for (let i = 1; i <= this._wscount; i++) {
-            let sheetname = this._arr_wsname[i - 1];
-            let hyperlink_cell = flex.itemsSource.items.findIndex(item => item.no == this._arr_wsindex[i - 1]) + 7;
+        for (let i = 0; i < this._arr_wsname.length; i++) {
+            let sheetname = this._arr_wsname[i];
+            let hyperlink_cell = flex.itemsSource.items.findIndex(item => item.no == this._arr_wsindex[i]) + 7;
             let worksheet = this._createContentForWS(this._newEmptyWorkSheet(sheetname), hyperlink_cell)
             this._ws.push(worksheet);
         }
@@ -359,7 +377,7 @@ export class ExportService {
     }
     _includeColumns(column) {
         // remove 3 columns button
-        return !column.binding.includes('btn');
+        return !(column.binding.includes('btn') || column.binding.includes('group'));
     }
     // ポイントをピクセルに変換する 1 pixel = 0.75 point
     _convertToPixel(point) {

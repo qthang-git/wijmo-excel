@@ -1,5 +1,5 @@
 :root {
-    --width-center: 800px
+    --width-center: 900px
 }
 
 .w800 {
@@ -16,14 +16,14 @@
     height: 500px;
 }
 
-.banner-sort {
+.banner {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
     gap: 10px 0;
 }
 
-.btn-sort {
+.btn-default {
     border: 0 !important;
     border-radius: 0 !important;
     outline: 0 !important;
@@ -39,6 +39,18 @@
 .float-right {
     float: right;
 }
-a[rel="noopener"]{
+
+#groups {
+    padding: 6px !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#btnExportToExcel {
+    width: 100%;
+}
+
+a[rel="noopener"] {
     display: none;
 }
