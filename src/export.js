@@ -81,6 +81,7 @@ export class ExportService {
         this._wscolumns.unshift(this._newEmptyColumn(18));
         // template main
         let countrows = this._wsrows.length;
+        let idxFomula = 0;
         for (let i = 0; i < countrows; i++) {
             let cells = this._wsrows[i].cells;
             cells.unshift(this._newEmptyCell());
@@ -132,6 +133,7 @@ export class ExportService {
                     }
                 }
                 else {
+                    let previous_cell = this._wsrows[i - 1].cells[j];
                     if (status_row == 0) {
                         this._wsrows[i].height = 19;
                         style.fill.color = 'rgb(255, 242, 204)';
@@ -155,8 +157,19 @@ export class ExportService {
                             style.borders.bottom.style = 0;
                         }
                     }
-                    if (i > 1 && j == 1 && cell.value != '') {
-                        cell.link = "#'" + this._arr_wsname[i - 2] + "'!B1";
+                    if (i > 1 && j == 1) {
+                        if (previous_cell.value == '' || previous_cell.value == "'") {
+                            idxFomula = 0;
+                        }
+                        if (cell.value != '' && cell.value != "'") {
+                            style.format = 'General';
+                            if (i != 2) {
+                                cell.formula = '=OFFSET(INDIRECT(ADDRESS(ROW()' + '-' + idxFomula + ',COLUMN())), -1, 0)+1';
+                            }
+                            cell.link = "#'" + this._arr_wsname[i - 2] + "'!B1";
+                        } else {
+                            idxFomula++;
+                        }
                     }
                 }
             }
@@ -228,7 +241,7 @@ export class ExportService {
         cellEmpty.colSpan = 0;
         cellEmpty.rowSpan = 0;
         cellEmpty.HAlign = wjcXlsx.HAlign.Left;
-        // cellEmpty.value = '';
+        cellEmpty.value = '';
         return cellEmpty;
     }
     _newEmptyRow(countcells) {

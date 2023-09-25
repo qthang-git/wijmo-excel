@@ -19,7 +19,7 @@ class App {
         const btnExportToExcel = document.getElementById('btnExportToExcel');
         this._excelExportContext = new ExcelExportContext(btnExportToExcel);
         btnExportToExcel.addEventListener('click', () => {
-            this._theGrid.worksheet_count = this._theGrid.itemsSource.sourceCollection.filter(item => item.status != 0).length;
+            this._theGrid.worksheet_count = this._itemsSource.sourceCollection.filter(item => item.status != 0).length;
             this._theGrid.xlsx_name = $('#file-name').val();
             this._theGrid.worksheet_name = $('#sheet-name').val();
             this._exportToExcel();
@@ -54,20 +54,21 @@ class App {
             if (result) {
                 $('#file-name').val('');
                 $('#sheet-name').val('');
-                let itemsSource = this._theGrid.itemsSource.sourceCollection;
+                let itemsSource = this._itemsSource.sourceCollection;
                 let len = itemsSource.length;
                 for (let i = 0; i < len; i++) {
                     itemsSource[i].operation = '';
                     itemsSource[i].checklist = '';
                 }
                 this._theGrid.select(-1, -1);
-                this._theGrid.itemsSource.refresh();
+                this._itemsSource.refresh();
             }
         });
         // handle sort 
         const btnMoveUp = document.getElementById('upwards');
         btnMoveUp.addEventListener('click', () => {
-            let source = this._theGrid.itemsSource.sourceCollection;
+            let scrollPosition = this._theGrid.scrollPosition;
+            let source = this._itemsSource.sourceCollection;
             let selectedRow = this._theGrid.selectedRows;
             let index = selectedRow[0].index;
             selectedRow.isSelected = false;
@@ -78,10 +79,12 @@ class App {
                 this._theGrid.collectionView.currentPosition = index - 1;
             }
             this._updateIndex(1, true);
+            this._theGrid.scrollPosition = new wjcCore.Point(scrollPosition.x, scrollPosition.y);
         });
         const btnMoveDown = document.getElementById('downwards');
         btnMoveDown.addEventListener('click', () => {
-            let source = this._theGrid.itemsSource.sourceCollection;
+            let scrollPosition = this._theGrid.scrollPosition;
+            let source = this._itemsSource.sourceCollection;
             let selectedRow = this._theGrid.selectedRows;
             let index = selectedRow[0].index;
             selectedRow.isSelected = false;
@@ -92,6 +95,7 @@ class App {
                 this._theGrid.collectionView.currentPosition = index + 1;
             }
             this._updateIndex(1, true);
+            this._theGrid.scrollPosition = new wjcCore.Point(scrollPosition.x, scrollPosition.y);
         });
 
     }
@@ -157,9 +161,9 @@ class App {
         this._theGrid = new wjcGrid.FlexGrid('#theGrid', {
             autoRowHeights: true,
             autoGenerateColumns: false,
-            showMarquee: true,
             columns: this._columns,
-            selectionMode: 'ListBox'
+            selectionMode: 'ListBox',
+            allowSorting: false
         });
         this._theGrid.select(-1, -1);
     }
@@ -174,7 +178,7 @@ class App {
             checklist: '',
             status: 1
         });
-        this._theGrid.itemsSource.sourceCollection = obj.json;
+        this._itemsSource.sourceCollection = obj.json;
         this._updateIndex(index);
     }
     // delete selected row in FlexGrid
@@ -185,7 +189,7 @@ class App {
         obj.json = data;
         if (rowcount > 2) {
             obj.json.splice(index, 1);
-            this._theGrid.itemsSource.sourceCollection = obj.json;
+            this._itemsSource.sourceCollection = obj.json;
             this._updateIndex(index);
         }
     }
@@ -200,18 +204,20 @@ class App {
             checklist: obj.json[index].checklist,
             status: obj.json[index].status
         });
-        this._theGrid.itemsSource.sourceCollection = obj.json;
+        this._itemsSource.sourceCollection = obj.json;
         this._updateIndex(index);
     }
     // update index row in FlexGrid 
     _updateIndex(index = 1, isSort = false) {
-        let source = this._theGrid.itemsSource.sourceCollection;
+        let source = this._itemsSource.sourceCollection;
         let len = source.length;
         for (var i = index; i < len; i++) {
-            source[i].no = i;
+            if (source[i].status != 0) {
+                source[i].no = i;
+            }
         }
         !isSort && this._theGrid.select(-1, -1);
-        this._theGrid.itemsSource.refresh();
+        this._itemsSource.refresh();
     }
     // export excel
     _exportToExcel() {
@@ -259,7 +265,9 @@ class App {
                     item.status = event.target.checked ? 0 : 1;
                     let index = event.target.checked ? _id + 1 : _id;
                     for (var i = index; i < data.length; i++) {
-                        data[i].no = event.target.checked ? i - 1 : i;
+                        if (data[i].status != 1) {
+                            data[i].no = event.target.checked ? i - 1 : i;
+                        }
                     }
                     s.refresh();
                 });

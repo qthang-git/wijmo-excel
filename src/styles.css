@@ -17,13 +17,16 @@
 }
 
 .banner-sort {
+    width: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px 0;
 }
 
-.banner-sort img {
-    cursor: pointer;
+.btn-sort {
+    border: 0 !important;
+    border-radius: 0 !important;
+    outline: 0 !important;
 }
 
 #notice {
@@ -33,6 +36,9 @@
     font-size: 12px;
 }
 
-.float-right{
+.float-right {
     float: right;
+}
+a[rel="noopener"]{
+    display: none;
 }
