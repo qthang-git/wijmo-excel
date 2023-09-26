@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>FlexGrid Overview</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link id="favicon" rel="shortcut icon"
-        href="https://d3ki9tyy5l5ruj.cloudfront.net/obj/df5bcec7e9873dddebdd1328901c287f0f069750/asana-logo-favicon@3x.png">
+    <!-- <link id="favicon" rel="shortcut icon"
+        href="https://d3ki9tyy5l5ruj.cloudfront.net/obj/df5bcec7e9873dddebdd1328901c287f0f069750/asana-logo-favicon@3x.png"> -->
     <!-- SystemJS -->
     <script src="node_modules/systemjs/dist/system.src.js"></script>
     <script src="systemjs.config.js"></script>
@@ -30,7 +30,7 @@
             <div class="toolbar-item col-sm-5 col-md-5">
                 <div class="input-group">
                     <input id="sheet-name" type="text" class="form-control" placeholder="Enter sheet name"
-                        aria-describedby="sspan-heet-name" maxlength="15">
+                        aria-describedby="span-sheet-name" maxlength="15">
                     <span class="input-group-addon" id="span-sheet-name">_テスト仕様書</span>
                 </div>
                 <div class="input-group">
@@ -47,6 +47,11 @@
         <!-- the grid -->
         <div class="row div-center w800">
             <div class="col-sm-11 col-md-11">
+                <!-- <div class="input-group" style="max-width: 400px">
+                    <span class="input-group-addon" id="span-numOfSheet">@</span>
+                    <input id="numOfSheet" type="text" class="form-control" placeholder="Khởi tạo số dòng ban đầu (mặc định là 5)"
+                        aria-describedby="span-numOfSheet" maxlength="15">
+                </div> -->
                 <div class="form-check checkbox-sheet">
                     <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
                     <label class="form-check-label" for="flexCheckChecked">

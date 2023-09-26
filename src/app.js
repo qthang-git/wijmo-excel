@@ -34,6 +34,7 @@ class App {
         // initializes handle event
         this._handlerEvent();
         // initializes items source
+        this._numberSheet = $('#numOfSheet').val()
         this._itemsSource = this._createItemsSource();
         this._theGrid.itemsSource = this._itemsSource;
     }
@@ -109,9 +110,9 @@ class App {
         this._columns = [
             { binding: 'no', header: 'No', width: 50, isReadOnly: true, dataType: "String", align: "right" },
             { binding: 'user', header: 'user', width: 30, visible: false, dataType: "String", align: "left" },
-            { binding: 'operation', header: '操作', width: '*', wordWrap: true, dataType: "String", align: "left" },
+            { binding: 'operation', header: '操作', width: '*', wordWrap: true, dataType: "String", align: "left", multiLine: true },
             { binding: 'tag', header: 'tag', width: 30, visible: false, dataType: "String", align: "left" },
-            { binding: 'checklist', header: '確認事項', width: '*', wordWrap: true, dataType: "String", align: "left" },
+            { binding: 'checklist', header: '確認事項', width: '*', wordWrap: true, dataType: "String", align: "left", multiLine: true },
             { binding: 'date', header: '日付', width: 50, visible: false, dataType: "Date", align: "left" },
             { binding: 'verifier', header: '検証者', width: 50, visible: false, dataType: "String", align: "left" },
             { binding: 'result', header: '結果', width: 50, visible: false, dataType: "String", align: "left" },
@@ -168,7 +169,7 @@ class App {
             autoRowHeights: true,
             autoGenerateColumns: false,
             columns: this._columns,
-            selectionMode: 'ListBox',
+            selectionMode: 'CellRange',
             allowSorting: false
         });
         this._theGrid._objGroup = {};
@@ -214,7 +215,7 @@ class App {
             status: obj.json[index].status
         });
         this._itemsSource.sourceCollection = obj.json;
-        this._updateIndex(index);
+        this._updateIndex();
     }
     // update index row in FlexGrid 
     _updateIndex(index = 1, isSort = false) {
@@ -248,7 +249,7 @@ class App {
     //     columns.splice(columnsCount - 3, 3);
     // }
     _createItemsSource() {
-        const data = this._dataSvc.getData(6);
+        const data = this._dataSvc.getData(this._numberSheet || 11);
         const view = new wjcCore.CollectionView(data);
         view.collectionChanged.addHandler((s, e) => {
         });

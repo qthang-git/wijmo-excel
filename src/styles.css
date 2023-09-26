@@ -1,5 +1,5 @@
 :root {
-    --width-center: 900px
+    --width-center: 1000px
 }
 
 .w800 {
@@ -13,7 +13,7 @@
 }
 
 #theGrid {
-    height: 500px;
+    height: 700px;
 }
 
 .banner {

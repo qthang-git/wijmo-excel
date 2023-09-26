@@ -4,6 +4,7 @@ import * as wjcGridXlsx from '@grapecity/wijmo.grid.xlsx';
 import * as wjcXlsx from '@grapecity/wijmo.xlsx';
 //
 const ExcelExportDocName = 'TEMPLATE-DEFAULT.xlsx';
+const ExcelExportSheetName = 'テスト仕様書';
 //
 export class ExportService {
     constructor() {
@@ -12,7 +13,7 @@ export class ExportService {
         this._wscolumns = [];
         this._wsrows = [];
         this._wscount = 0;
-        this._wsname = 'テスト仕様書';
+        this._wsname = ExcelExportSheetName;
         this._excelExportDocName = ExcelExportDocName;
         this._ws_font_family = 'Meiryo UI';
         this._arr_wsname = [];
@@ -31,7 +32,8 @@ export class ExportService {
             this._excelExportDocName = flex.xlsx_name + '.xlsx';
         }
         if (flex.worksheet_name != '') {
-            this._wsname = flex.worksheet_name + '_' + this._wsname;
+            this._wsname = '';
+            this._wsname = flex.worksheet_name + '_' + ExcelExportSheetName;
         }
         this._wscount = flex.worksheet_count;
         this._arr_wsindex = flex.worksheet_index;
@@ -106,7 +108,7 @@ export class ExportService {
         for (let i = 0; i < countrows; i++) {
             let cells = this._wsrows[i].cells;
             cells.unshift(this._newEmptyCell());
-            this._wsrows[i].height = i == 0 ? this._convertToPixel(14.25) : this._convertToPixel(18.75);
+            this._wsrows[i].height = i == 0 ? this._convertToPixel(14.25) : this._wsrows[i].height > this._convertToPixel(18.75) ? this._wsrows[i].height : this._convertToPixel(18.75);
             let countcells = cells.length;
             let status_row = 1;
             if (i != 0) {
@@ -137,6 +139,7 @@ export class ExportService {
                 };
                 style.font.size = this._convertToPixel(10);
                 style.font.family = this._ws_font_family;
+                style.vAlign = wjcXlsx.VAlign.Center;
                 if (i == 0) { // header
                     style.hAlign = wjcXlsx.HAlign.Center;
                     style.borders.top.style = 1;
@@ -158,13 +161,13 @@ export class ExportService {
                     if (status_row == 0) {
                         this._wsrows[i].height = 19;
                         style.fill.color = 'rgb(255, 242, 204)';
-                        cell.colSpan = countcells;
+                        // cell.colSpan = countcells;
                         if (j < countcells - 1) {
                             style.borders.right.style = 0;
                         }
+                        cell.value = undefined;
                         if (j == 0) {
                             cell.value = cells[3].value;
-                            cells[3].value = '';
                         }
                     }
                     if (j == 0) {
@@ -178,25 +181,38 @@ export class ExportService {
                             style.borders.bottom.style = 0;
                         }
                     }
-                    if (i > 1 && j == 1) {
-                        if (cell.value != '' && cell.value != "'") {
-                            style.format = 'General';
-                            if (i != 2) {
-                                let minus_row = idxFomula != 0 ? ('-' + idxFomula) : '';
-                                cell.formula = '=OFFSET(INDIRECT(ADDRESS(ROW()' + minus_row + ',COLUMN())), -1, 0)+1';
+                    // begin from row 2
+                    if (i > 1) {
+                        // remove value "'" when if cell in grid is empty
+                        if (cell.value == "'") {
+                            cell.value = undefined;
+                        }
+                        style.format = 'General';
+                        // column [no]
+                        if (j == 1) {
+                            if (cell.value != undefined) {
+                                if (i != 2) {
+                                    let minus_row = idxFomula != 0 ? ('-' + idxFomula) : '';
+                                    cell.formula = '=OFFSET(INDIRECT(ADDRESS(ROW()' + minus_row + ',COLUMN())), -1, 0)+1';
+                                }
+                                if (flex._isCreateSheetChild) {
+                                    style.font.underline = true;
+                                    style.font.color = '#4F81BD';
+                                    cell.link = "#'" + this._arr_wsname[cell.value - 1] + "'!B1";
+                                }
+                                if (previous_cell.value == undefined) {
+                                    idxFomula = 0;
+                                }
+                            } else {
+                                idxFomula += 1;
                             }
-                            if (flex._isCreateSheetChild) {
-                                style.font.underline = true;
-                                style.font.color = '#4F81BD';
-                                cell.link = "#'" + this._arr_wsname[cell.value - 1] + "'!B1";
-                            }
-                            if (previous_cell.value == '' || previous_cell.value == "'") {
-                                idxFomula = 0;
-                            }
-                        } else {
-                            idxFomula += 1;
+                        }
+                        // column [date]
+                        else if (j == 6) {
+                            style.format = 'yyyy-mm-dd';
                         }
                     }
+
                 }
             }
         }
@@ -362,14 +378,14 @@ export class ExportService {
             if (typeof item !== 'undefined' && item.group != '') {
                 let index = flex.itemsSource.items.find(ele => ele.group == item.group);
                 if (typeof index !== 'undefined' && index.no != hyperlink_cell) {
-                    hyperlink_cell = index;
+                    hyperlink_cell = index.no;
                 }
             }
         }
         if (typeof item !== 'undefined') {
             let count_header_row = 0;
-            idx = this._arr_wsindex[i];
-            // idx = i;
+            // idx = this._arr_wsindex[i];
+            idx = i != 0 ? i : 1;
             while (idx < itemIndex) {
                 if (flex.itemsSource.items[idx].status == 0) {
                     count_header_row += 1;
