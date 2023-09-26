@@ -51,6 +51,11 @@
     width: 100%;
 }
 
-a[rel="noopener"] {
+.checkbox-sheet {
+    float: left;
+}
+
+a[rel="noopener"],
+div[style^="position: fixed"] {
     display: none;
 }

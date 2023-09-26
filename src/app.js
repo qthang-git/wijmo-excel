@@ -25,6 +25,7 @@ class App {
             this._theGrid.worksheet_index = arrTestCase.map(arr => arr.no);
             this._theGrid.xlsx_name = $('#file-name').val();
             this._theGrid.worksheet_name = $('#sheet-name').val();
+            this._theGrid._isCreateSheetChild = $('#flexCheckChecked').prop('checked');
             this._exportToExcel();
         });
         // initializes the grid
@@ -62,6 +63,7 @@ class App {
                 for (let i = 0; i < len; i++) {
                     itemsSource[i].operation = '';
                     itemsSource[i].checklist = '';
+                    itemsSource[i].group = '';
                 }
                 this._theGrid.select(-1, -1);
                 this._itemsSource.refresh();
@@ -181,6 +183,7 @@ class App {
             no: index + 1,
             operation: '',
             checklist: '',
+            group: '',
             status: 1
         });
         this._itemsSource.sourceCollection = obj.json;
@@ -207,6 +210,7 @@ class App {
             no: index + 1,
             operation: obj.json[index].operation,
             checklist: obj.json[index].checklist,
+            group: obj.json[index].group,
             status: obj.json[index].status
         });
         this._itemsSource.sourceCollection = obj.json;
@@ -244,7 +248,7 @@ class App {
     //     columns.splice(columnsCount - 3, 3);
     // }
     _createItemsSource() {
-        const data = this._dataSvc.getData(5);
+        const data = this._dataSvc.getData(6);
         const view = new wjcCore.CollectionView(data);
         view.collectionChanged.addHandler((s, e) => {
         });
@@ -288,12 +292,12 @@ class App {
                 }
                 for (let i = 0; i < data.length; i++) {
                     if (data[i].status != 0 && data[i].group != '') {
-                        s._objGroup['Group' + data[i].group] = [];
+                        s._objGroup[data[i].group] = [];
                     }
                 }
                 for (let i = 0; i < data.length; i++) {
                     if (data[i].status != 0 && data[i].group != '') {
-                        s._objGroup['Group' + data[i].group].push(data[i].no);
+                        s._objGroup[data[i].group].push(data[i].no);
                     }
                 }
             }

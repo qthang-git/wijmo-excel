@@ -18,6 +18,7 @@ export class ExportService {
         this._arr_wsname = [];
         this._arr_wsindex = [];
         this._objGroup = {};
+        this._count_header_row = 0;
     }
     startExcelExport(flex, ctx) {
         if (ctx.preparing || ctx.exporting) {
@@ -65,7 +66,7 @@ export class ExportService {
         });
     }
     _createOtherWSName(flex) {
-        let arr_wsname = [];
+        this._arr_wsname = [];
         let keys = Object.keys(this._objGroup);
         for (let i = 0; i < this._arr_wsindex.length; i++) {
             let sheetChildNo = this._arr_wsindex[i];
@@ -83,9 +84,8 @@ export class ExportService {
                 }
             }
             let sheetChildName = 'エビデンス（No ' + sheetChildNo + '. ' + flex.worksheet_name + '）';
-            arr_wsname.push(sheetChildName);
+            this._arr_wsname.push(sheetChildName);
         }
-        this._arr_wsname = [...new Set(arr_wsname)];
     }
     _formatItemExcel(e) {
     }
@@ -181,13 +181,15 @@ export class ExportService {
                     if (i > 1 && j == 1) {
                         if (cell.value != '' && cell.value != "'") {
                             style.format = 'General';
-                            style.font.underline = true;
-                            style.font.color = '#4F81BD';
                             if (i != 2) {
                                 let minus_row = idxFomula != 0 ? ('-' + idxFomula) : '';
                                 cell.formula = '=OFFSET(INDIRECT(ADDRESS(ROW()' + minus_row + ',COLUMN())), -1, 0)+1';
                             }
-                            cell.link = "#'" + this._arr_wsname[cell.value - 1] + "'!B1";
+                            if (flex._isCreateSheetChild) {
+                                style.font.underline = true;
+                                style.font.color = '#4F81BD';
+                                cell.link = "#'" + this._arr_wsname[cell.value - 1] + "'!B1";
+                            }
                             if (previous_cell.value == '' || previous_cell.value == "'") {
                                 idxFomula = 0;
                             }
@@ -254,8 +256,11 @@ export class ExportService {
             }
         }
         this._wsrows[4].cells[3].formula = '="総数「" & MAX(C5:C49653) & "」　OK「" & COUNTIF(J5:J49653,"OK") & "」　NG「" & COUNTIF(J5:J49653,"NG") & "」　未「" & MAX(C5:C49653)-(COUNTIF(J5:J49653,"OK")+COUNTIF(J5:J49653,"NG")) & "」　進捗「" & ROUND((COUNTIF(J5:J49653,"OK")+COUNTIF(J5:J49653,"NG"))/MAX(C5:C49653)*100,1) & "%」"';
-        this._addNewWorkSheet(flex);
+        if (flex._isCreateSheetChild) {
+            this._addNewWorkSheet(flex);
+        }
     }
+    // initializes empty cell
     _newEmptyCell() {
         let cellEmpty = new wjcXlsx.WorkbookCell();
         cellEmpty.style = new wjcXlsx.WorkbookStyle();
@@ -268,6 +273,7 @@ export class ExportService {
         cellEmpty.value = '';
         return cellEmpty;
     }
+    // initializes empty row
     _newEmptyRow(countcells) {
         let rowEmpty = new wjcXlsx.WorkbookRow();
         rowEmpty.visible = true;
@@ -280,6 +286,7 @@ export class ExportService {
         }
         return rowEmpty;
     }
+    // initializes empty column
     _newEmptyColumn(width) {
         let columnEmpty = new wjcXlsx.WorkbookColumn();
         columnEmpty.autoWidth = true;
@@ -293,37 +300,92 @@ export class ExportService {
         }
         return columnEmpty;
     }
+    // initializes empty worksheet
     _newEmptyWorkSheet(sheetname, row = 4, column = 20) {
+        if (this._ws.filter(m => m.name == sheetname).length != 0) {
+            return 0;
+        }
         let worksheet = {};
         worksheet.name = sheetname;
         worksheet.visible = true;
-        worksheet.frozenPane = {};
-        worksheet.frozenPane.rows = row;
-        worksheet.frozenPane.columns = 0;
+
         worksheet.rows = [];
         worksheet.columns = [];
         for (let i = 0; i < row; i++) {
             worksheet.rows.push(this._newEmptyRow(column));
         }
+        // when exists group row
+        const keys = Object.keys(this._objGroup);
+        if (keys.length > 0) {
+            for (let i = 0; i < keys.length; i++) {
+                const group_row = this._objGroup[keys[i]];
+                for (let j = 1; j < group_row.length; j++) {
+                    worksheet.rows.splice((j + 2), 0, this._newEmptyRow(column));
+                }
+            }
+        }
         for (let i = 0; i < column; i++) {
             worksheet.columns.push(this._newEmptyColumn());
         }
+        worksheet.frozenPane = {};
+        worksheet.frozenPane.rows = worksheet.rows.length;
+        worksheet.frozenPane.columns = 0;
         return worksheet;
     }
+    // add child worksheet into main worksheet
     _addNewWorkSheet(flex) {
-        for (let i = 0; i < this._arr_wsname.length; i++) {
+        // const keys = Object.keys(this._objGroup);
+        const unique_wsname = [...new Set(this._arr_wsname)];
+        let hyperlink_cell = 1;
+        for (let i = 0; i < this._arr_wsindex.length; i++) {
             let sheetname = this._arr_wsname[i];
-            let hyperlink_cell = flex.itemsSource.items.findIndex(item => item.no == this._arr_wsindex[i]) + 7;
-            let worksheet = this._createContentForWS(this._newEmptyWorkSheet(sheetname), hyperlink_cell)
-            this._ws.push(worksheet);
+            let tempHyperLinkCell = this._getHyperLinkBackCell(flex, i);
+            // if (hyperlink_cell != tempHyperLinkCell) 
+            {
+                hyperlink_cell = tempHyperLinkCell;
+                let tmp = this._newEmptyWorkSheet(sheetname);
+                if (!(tmp == 0)) {
+                    let worksheet = this._createContentForWS(flex, tmp, hyperlink_cell, i);
+                    this._ws.push(worksheet);
+                }
+            }
         }
     }
-    _createContentForWS(worksheet, hyperlink_cell) {
-        // hyperlink back to main sheet
-        worksheet.rows[0].cells[1].style.font.underline = true;
-        worksheet.rows[0].cells[1].style.font.color = '#4F81BD';
-        worksheet.rows[0].cells[1].value = '戻る';
-        worksheet.rows[0].cells[1].link = "#'" + this._wsname + "'!C" + hyperlink_cell;
+    _getHyperLinkBackCell(flex, i) {
+        let item = flex.itemsSource.items.find(item => this._arr_wsindex[i] == item.no);
+        let itemIndex = flex.itemsSource.items.findIndex(item => this._arr_wsindex[i] == item.no);
+        let hyperlink_cell = typeof item !== 'undefined' ? item.no : 1;
+        let idx = 0;
+        const keys = Object.keys(this._objGroup);
+        // when exists group row
+        if (keys.length > 0) {
+            if (typeof item !== 'undefined' && item.group != '') {
+                let index = flex.itemsSource.items.find(ele => ele.group == item.group);
+                if (typeof index !== 'undefined' && index.no != hyperlink_cell) {
+                    hyperlink_cell = index;
+                }
+            }
+        }
+        if (typeof item !== 'undefined') {
+            let count_header_row = 0;
+            idx = this._arr_wsindex[i];
+            // idx = i;
+            while (idx < itemIndex) {
+                if (flex.itemsSource.items[idx].status == 0) {
+                    count_header_row += 1;
+                }
+                idx++;
+            }
+            if (item.no != hyperlink_cell) {
+                this._count_header_row = count_header_row;
+            }
+            hyperlink_cell = item.no + count_header_row;
+
+        }
+        return hyperlink_cell + 7;
+    }
+    // create content for worksheet child
+    _createContentForWS(flex, worksheet, hyperlink_cell, indexSheet) {
         // header with light green background
         // get text '操作' from main sheet
         worksheet.rows[1].cells[1].formula = "='" + this._wsname + "'!E6";
@@ -333,14 +395,42 @@ export class ExportService {
         worksheet.rows[1].cells[11].formula = "='" + this._wsname + "'!G6";
         worksheet.rows[1].cells[11].style.fill.color = 'rgb(226, 239, 218)';
         worksheet.rows[1].cells[11].colSpan = 9;
-        // 
-        worksheet.rows[2].cells[1].formula = "='" + this._wsname + "'!E" + hyperlink_cell;
-        worksheet.rows[2].cells[1].colSpan = 10;
-        worksheet.rows[2].cells[11].formula = "='" + this._wsname + "'!G" + hyperlink_cell;
-        worksheet.rows[2].cells[11].colSpan = 9;
+        // hyperlink back to main sheet
+        worksheet.rows[0].cells[1].style.font.underline = true;
+        worksheet.rows[0].cells[1].style.font.color = '#4F81BD';
+        worksheet.rows[0].cells[1].value = '戻る';
+        worksheet.rows[0].cells[1].link = "#'" + this._wsname + "'!C" + hyperlink_cell;
 
+        let item = flex.itemsSource.items.find(item => item.no == this._arr_wsindex[indexSheet]);
+        let idxBorder = 4;
+        const keys = Object.keys(this._objGroup);
+        if (keys.length > 0) {
+            if (typeof item !== 'undefined' && item.group != '') {
+                let len = flex.itemsSource.items.filter(flr => flr.group == item.group).length;
+                idxBorder += len - 1;
+                for (let i = 0; i < len; i++) {
+                    // get test case main -> child
+                    worksheet.rows[i + 2].cells[1].formula = "='" + this._wsname + "'!E" + (hyperlink_cell + i);
+                    worksheet.rows[i + 2].cells[1].colSpan = 10;
+                    worksheet.rows[i + 2].cells[11].formula = "='" + this._wsname + "'!G" + (hyperlink_cell + i);
+                    worksheet.rows[i + 2].cells[11].colSpan = 9;
+                }
+            } else {
+                // get test case main -> child
+                worksheet.rows[2].cells[1].formula = "='" + this._wsname + "'!E" + hyperlink_cell;
+                worksheet.rows[2].cells[1].colSpan = 10;
+                worksheet.rows[2].cells[11].formula = "='" + this._wsname + "'!G" + hyperlink_cell;
+                worksheet.rows[2].cells[11].colSpan = 9;
+            }
+        } else {
+            // get test case main -> child
+            worksheet.rows[2].cells[1].formula = "='" + this._wsname + "'!E" + hyperlink_cell;
+            worksheet.rows[2].cells[1].colSpan = 10;
+            worksheet.rows[2].cells[11].formula = "='" + this._wsname + "'!G" + hyperlink_cell;
+            worksheet.rows[2].cells[11].colSpan = 9;
+        }
         // add border for cell
-        for (let i = 1; i < 4 - 1; i++) {
+        for (let i = 1; i < idxBorder - 1; i++) {
             for (let j = 1; j < 20; j++) {
                 worksheet.rows[i].cells[j].style.borders = {
                     top: {
@@ -364,6 +454,7 @@ export class ExportService {
         }
         return worksheet;
     }
+    // show all columns on the grid
     _visibleAllColumns(columns, flex) {
         columns.forEach((col, idx) => {
             if (!col.visible) {
@@ -375,11 +466,12 @@ export class ExportService {
             col.visible = true;
         });
     }
+    // handle event include column to excel
     _includeColumns(column) {
         // remove 3 columns button
         return !(column.binding.includes('btn') || column.binding.includes('group'));
     }
-    // ポイントをピクセルに変換する 1 pixel = 0.75 point
+    // convert pixel to point (1 pixel = 0.75 point)
     _convertToPixel(point) {
         return point * 4 / 3;
     }
