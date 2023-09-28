@@ -19,7 +19,6 @@ export class ExportService {
         this._arr_wsname = [];
         this._arr_wsindex = [];
         this._objGroup = {};
-        this._count_header_row = 0;
     }
     startExcelExport(flex, ctx) {
         if (ctx.preparing || ctx.exporting) {
@@ -323,7 +322,7 @@ export class ExportService {
     // initializes empty worksheet
     _newEmptyWorkSheet(sheetname, i, row = 4, column = 20) {
         if (this._ws.filter(m => m.name == sheetname).length != 0) {
-            return 0;
+            return;
         }
         let worksheet = {};
         worksheet.name = sheetname;
@@ -354,58 +353,19 @@ export class ExportService {
     }
     // add child worksheet into main worksheet
     _addNewWorkSheet(flex) {
-        // const keys = Object.keys(this._objGroup);
-        const unique_wsname = [...new Set(this._arr_wsname)];
-        let hyperlink_cell = 1;
         for (let i = 0; i < this._arr_wsindex.length; i++) {
             let sheetname = this._arr_wsname[i];
-            let tempHyperLinkCell = this._getHyperLinkBackCell(flex, i);
-            // if (hyperlink_cell != tempHyperLinkCell) 
-            {
-                hyperlink_cell = tempHyperLinkCell;
-                let tmp = this._newEmptyWorkSheet(sheetname, this._arr_wsindex[i]);
-                if (!(tmp == 0)) {
-                    let worksheet = this._createContentForWS(flex, tmp, hyperlink_cell, i);
-                    this._ws.push(worksheet);
-                }
+            let row_no = this._arr_wsindex[i];
+            let row_item = flex.itemsSource.items.find(item => item.no == row_no);
+            let hyperlink_cell = flex.itemsSource.items.findIndex(item => item.no == row_no) + 7;
+            let worksheet = this._newEmptyWorkSheet(sheetname, this._arr_wsindex[i]);
+            if (typeof worksheet !== 'undefined') {
+                this._ws.push(this._createContentForWS(flex, worksheet, hyperlink_cell, row_item));
             }
         }
-    }
-    _getHyperLinkBackCell(flex, i) {
-        let item = flex.itemsSource.items.find(item => this._arr_wsindex[i] == item.no);
-        let itemIndex = flex.itemsSource.items.findIndex(item => this._arr_wsindex[i] == item.no);
-        let hyperlink_cell = typeof item !== 'undefined' ? item.no : 1;
-        let idx = 0;
-        const keys = Object.keys(this._objGroup);
-        // when exists group row
-        if (keys.length > 0) {
-            if (typeof item !== 'undefined' && item.group != '') {
-                let index = flex.itemsSource.items.find(ele => ele.group == item.group);
-                if (typeof index !== 'undefined' && index.no != hyperlink_cell) {
-                    hyperlink_cell = index.no;
-                }
-            }
-        }
-        if (typeof item !== 'undefined') {
-            let count_header_row = 0;
-            // idx = this._arr_wsindex[i];
-            idx = i != 0 ? i : 1;
-            while (idx < itemIndex) {
-                if (flex.itemsSource.items[idx].status == 0) {
-                    count_header_row += 1;
-                }
-                idx++;
-            }
-            if (item.no != hyperlink_cell) {
-                this._count_header_row = count_header_row;
-            }
-            hyperlink_cell = item.no + count_header_row;
-
-        }
-        return hyperlink_cell + 7;
     }
     // create content for worksheet child
-    _createContentForWS(flex, worksheet, hyperlink_cell, indexSheet) {
+    _createContentForWS(flex, worksheet, hyperlink_cell, row_item) {
         // header with light green background
         // get text '操作' from main sheet
         worksheet.rows[1].cells[1].formula = "='" + this._wsname + "'!E6";
@@ -420,13 +380,12 @@ export class ExportService {
         worksheet.rows[0].cells[1].style.font.color = '#4F81BD';
         worksheet.rows[0].cells[1].value = '戻る';
         worksheet.rows[0].cells[1].link = "#'" + this._wsname + "'!C" + hyperlink_cell;
-
-        let item = flex.itemsSource.items.find(item => item.no == this._arr_wsindex[indexSheet]);
+        // let item = flex.itemsSource.items.find(item => item.no == this._arr_wsindex[indexSheet]);
         let idxBorder = 4;
         const keys = Object.keys(this._objGroup);
         if (keys.length > 0) {
-            if (typeof item !== 'undefined' && item.group != '') {
-                let len = flex.itemsSource.items.filter(flr => flr.group == item.group).length;
+            if (typeof row_item !== 'undefined' && row_item.group != '') {
+                let len = flex.itemsSource.items.filter(flr => flr.group == row_item.group).length;
                 idxBorder += len - 1;
                 for (let i = 0; i < len; i++) {
                     // get test case main -> child

@@ -79,6 +79,7 @@
     max-width: 50px;
     padding: 2px 5px;
     max-height: 22px;
+    border-radius: 0;
 }
 
 label[for="flexCheckChecked"] {
@@ -91,7 +92,7 @@ label[for="flexCheckChecked"]:before {
     content: '';
     height: 20px;
     width: 20px;
-    border: 1px solid #000;
+    border: 1px solid grey;
     position: absolute;
     left: -25px;
     top: 0;

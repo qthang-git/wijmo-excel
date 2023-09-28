@@ -23,15 +23,15 @@
             <div class="toolbar-item col-sm-5 col-md-5">
                 <div class="input-group">
                     <input id="fileName" type="text" class="form-control" placeholder="Enter file name"
-                        aria-describedby="span-fileName">
-                    <span class="input-group-addon" id="span-fileName">.xlsx</span>
+                        aria-describedby="label-fileName">
+                    <label class="input-group-addon" id="label-fileName" for="fileName">.xlsx</label>
                 </div>
             </div>
             <div class="toolbar-item col-sm-5 col-md-5">
                 <div class="input-group">
                     <input id="sheetName" type="text" class="form-control" placeholder="Enter sheet name"
-                        aria-describedby="span-sheetName" maxlength="15">
-                    <span class="input-group-addon" id="span-sheetName">_テスト仕様書</span>
+                        aria-describedby="label-sheetName" maxlength="15">
+                    <label class="input-group-addon" id="label-sheetName" for="sheetName">_テスト仕様書</label>
                 </div>
                 <div class="input-group">
                     <span id="notice">(Maximum 15 characters)
@@ -53,17 +53,10 @@
                         </label>
                     </div>
                     <div class="div-textfield">
-                        <label for="numOfSheet">Row</label>
-                        <input id="numOfSheet" type="text" class="form-control" placeholder="10" maxlength="3">
+                        <label for="countSheet">Row</label>
+                        <input id="countSheet" type="text" class="form-control" placeholder="10" maxlength="3">
                     </div>
                 </div>
-            </div>
-            <div class="col-sm-4 col-md-4">
-                <!-- <div class="input-group">
-                    <label class="input-group-addon" id="span-numOfSheet" for="numOfSheet">Row</label>
-                    <input id="numOfSheet" type="text" class="form-control" placeholder="10"
-                        aria-describedby="span-numOfSheet" maxlength="3">
-                </div> -->
             </div>
         </div>
         <!-- the grid -->

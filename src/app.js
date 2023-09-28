@@ -52,10 +52,10 @@ class App {
             }
         });
         // handle change field [number of sheet]
-        const numSheet = document.getElementById('numOfSheet');
+        const numSheet = document.getElementById('countSheet');
         numSheet.addEventListener('change', (evt) => {
             let value = evt.target.value;
-            if(isNaN(value)){
+            if (isNaN(value)) {
                 evt.target.value = '';
                 return;
             }
@@ -75,9 +75,9 @@ class App {
                 const SheetName = document.getElementById('sheetName');
                 SheetName.value = '';
                 // clear num of sheet
-                const NumOfSheet = document.getElementById('numOfSheet');
-                NumOfSheet.value = '';
-                NumOfSheet.dispatchEvent(new Event('change'));
+                const CountSheet = document.getElementById('countSheet');
+                CountSheet.value = '';
+                CountSheet.dispatchEvent(new Event('change'));
                 // clear checkbox create child sheet
                 const ChkSheetChild = document.getElementById('flexCheckChecked');
                 ChkSheetChild.checked = false;
@@ -284,8 +284,13 @@ class App {
     _exportToExcel() {
         const ctx = this._excelExportContext;
         if (!ctx.exporting) {
-            // this._customizeGridForExcel();
-            this._exportSvc.startExcelExport(this._theGrid, ctx);
+            const theGrid = this._theGrid;
+            theGrid.itemsSource.sourceCollection.forEach(item => {
+                if (item.status == 0) {
+                    item.group = '';
+                }
+            });
+            this._exportSvc.startExcelExport(theGrid, ctx);
         }
         else {
             this._exportSvc.cancelExcelExport(ctx);
@@ -306,9 +311,10 @@ class App {
     }
     _formatItem() {
         this._theGrid.formatItem.addHandler(function (s, e) {
-            const _id = e.row;
-            const data = s.itemsSource.sourceCollection;
-            let item = data[_id];
+            const ID = e.row;
+            const Data = s.itemsSource.sourceCollection;
+            const Item = Data[ID];
+            const Group = s._objGroup[Item.group];
             // handle column header
             if (e.panel == s.columnHeaders) {
                 if (e.row == 0) {
@@ -317,17 +323,25 @@ class App {
             }
             // handle row header
             if (e.panel == s.rowHeaders) {
-                e.cell.innerHTML = '<input class="row-checkbox" id="chk_' + _id + '" type="checkbox" ' + (item.status != 1 ? 'checked' : '') + '>';
+                e.cell.innerHTML = '<input class="row-checkbox" id="chk_' + ID + '" type="checkbox" ' + (Item.status != 1 ? 'checked' : '') + '>';
                 if (e.row == 0 && e.col == 0) {
                     e.cell.classList.add('wj-state-disabled');
                 }
-                $('#chk_' + _id).off('click').on('click', function (event) {
-                    item.no = '';
-                    item.status = event.target.checked ? 0 : 1;
+                $('#chk_' + ID).off('click').on('click', function (event) {
+                    if (Item.group != '') {
+                        for (let i = 0; i < Group.length; i++) {
+                            if (Group[i] == Item.no) {
+                                Group.splice(i, 1);
+                            }
+                        }
+                    }
+                    Item.no = '';
+                    Item.status = event.target.checked ? 0 : 1;
+                    // update row_no
                     let index = 1;
-                    for (var i = 1; i < data.length; i++) {
-                        if (data[i].status != 0) {
-                            data[i].no = index;
+                    for (let idx = 1; idx < Data.length; idx++) {
+                        if (Data[idx].status != 0) {
+                            Data[idx].no = index;
                             index++;
                         }
                     }
@@ -337,20 +351,20 @@ class App {
             // handle cell
             if (e.panel == s.cells) {
                 // remove [action button] & [group] if status is 0
-                if (item.status == 0) {
+                if (Item.status == 0) {
                     if (e.col == 4 || e.col == 9 || e.col == 10 || e.col == 11 || e.col == 12)
                         e.cell.innerHTML = '';
                     if (e.col == 4 || e.col == 9)
                         e.cell.classList.add('wj-state-disabled')
                 }
-                for (let i = 0; i < data.length; i++) {
-                    if (data[i].status != 0 && data[i].group != '') {
-                        s._objGroup[data[i].group] = [];
+                for (let i = 0; i < Data.length; i++) {
+                    if (Data[i].status != 0 && Data[i].group != '') {
+                        s._objGroup[Data[i].group] = [];
                     }
                 }
-                for (let i = 0; i < data.length; i++) {
-                    if (data[i].status != 0 && data[i].group != '') {
-                        s._objGroup[data[i].group].push(data[i].no);
+                for (let i = 0; i < Data.length; i++) {
+                    if (Data[i].status != 0 && Data[i].group != '') {
+                        s._objGroup[Data[i].group].push(Data[i].no);
                     }
                 }
             }
