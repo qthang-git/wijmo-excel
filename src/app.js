@@ -81,16 +81,6 @@ class App {
                 // clear checkbox create child sheet
                 const ChkSheetChild = document.getElementById('flexCheckChecked');
                 ChkSheetChild.checked = false;
-                // clear data in list
-                // let itemsSource = this._itemsSource.sourceCollection;
-                // let len = itemsSource.length;
-                // for (let i = 0; i < len; i++) {
-                //     itemsSource[i].operation = '';
-                //     itemsSource[i].checklist = '';
-                //     itemsSource[i].group = '';
-                // }
-                // this._theGrid.select(-1, -1);
-                // this._itemsSource.refresh();
             }
         });
         // handle btn-sort 
@@ -296,12 +286,6 @@ class App {
             this._exportSvc.cancelExcelExport(ctx);
         }
     }
-    // _customizeGridForExcel() {
-    //     // remove 3 columns contains button add/del/copy
-    //     let columns = this._theGrid.columns;
-    //     let columnsCount = columns.length;
-    //     columns.splice(columnsCount - 3, 3);
-    // }
     _createItemsSource(numberSheet) {
         const data = this._dataSvc.getData(numberSheet || 11);
         const view = new wjcCore.CollectionView(data);
