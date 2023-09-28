@@ -19,19 +19,19 @@
 <body>
     <div class="container-fluid">
         <br>
-        <div class="row div-center w800">
+        <div class="row div-center w800" style="margin-bottom: 10px">
             <div class="toolbar-item col-sm-5 col-md-5">
                 <div class="input-group">
-                    <input id="file-name" type="text" class="form-control" placeholder="Enter file name"
-                        aria-describedby="span-file-name">
-                    <span class="input-group-addon" id="span-file-name">.xlsx</span>
+                    <input id="fileName" type="text" class="form-control" placeholder="Enter file name"
+                        aria-describedby="span-fileName">
+                    <span class="input-group-addon" id="span-fileName">.xlsx</span>
                 </div>
             </div>
             <div class="toolbar-item col-sm-5 col-md-5">
                 <div class="input-group">
-                    <input id="sheet-name" type="text" class="form-control" placeholder="Enter sheet name"
-                        aria-describedby="span-sheet-name" maxlength="15">
-                    <span class="input-group-addon" id="span-sheet-name">_テスト仕様書</span>
+                    <input id="sheetName" type="text" class="form-control" placeholder="Enter sheet name"
+                        aria-describedby="span-sheetName" maxlength="15">
+                    <span class="input-group-addon" id="span-sheetName">_テスト仕様書</span>
                 </div>
                 <div class="input-group">
                     <span id="notice">(Maximum 15 characters)
@@ -39,33 +39,44 @@
                 </div>
             </div>
             <div class="toolbar-item col-sm-2 col-md-2">
-                <button id="clear-all" class="btn btn-primary float-right">Clear All</button>
-
+                <button id="btn-clear" class="btn btn-primary btn-default float-right">Clear All</button>
             </div>
         </div>
-        <br>
+        <div class="row div-center w800" style="margin-bottom: 10px">
+            <div class="col-sm-12 col-md-12">
+                <div class="custom-bar">
+                    <div class="div-checkbox">
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
+                            style="display: none;">
+                        <label class="form-check-label" for="flexCheckChecked">
+                            Create child sheet
+                        </label>
+                    </div>
+                    <div class="div-textfield">
+                        <label for="numOfSheet">Row</label>
+                        <input id="numOfSheet" type="text" class="form-control" placeholder="10" maxlength="3">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 col-md-4">
+                <!-- <div class="input-group">
+                    <label class="input-group-addon" id="span-numOfSheet" for="numOfSheet">Row</label>
+                    <input id="numOfSheet" type="text" class="form-control" placeholder="10"
+                        aria-describedby="span-numOfSheet" maxlength="3">
+                </div> -->
+            </div>
+        </div>
         <!-- the grid -->
         <div class="row div-center w800">
             <div class="col-sm-11 col-md-11">
-                <!-- <div class="input-group" style="max-width: 400px">
-                    <span class="input-group-addon" id="span-numOfSheet">@</span>
-                    <input id="numOfSheet" type="text" class="form-control" placeholder="Khởi tạo số dòng ban đầu (mặc định là 5)"
-                        aria-describedby="span-numOfSheet" maxlength="15">
-                </div> -->
-                <div class="form-check checkbox-sheet">
-                    <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
-                    <label class="form-check-label" for="flexCheckChecked">
-                        Create child sheet
-                    </label>
-                </div>
                 <div id="theGrid">
                 </div>
             </div>
             <div class="col-sm-1 col-md-1">
-                <div class="banner">
-                    <button id="upwards" class="btn btn-success btn-default">△</button>
-                    <button id="downwards" class="btn btn-success btn-default">▽</button>
-                    <button id="groups" class="btn btn-warning btn-default">
+                <div class="banner float-right">
+                    <button id="btn-upwards" class="btn btn-success btn-default" title="Move Up">△</button>
+                    <button id="btn-downwards" class="btn btn-success btn-default" title="Move Down">▽</button>
+                    <button id="btn-groups" class="btn btn-warning btn-default" title="Group">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                             style="transform: scale(0.8)">
                             <path

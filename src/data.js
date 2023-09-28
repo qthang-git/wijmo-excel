@@ -16,7 +16,7 @@ export class DataService {
     }
     getData(count) {
         const data = [];
-        const itemsCount = Math.max(count, 5);
+        const itemsCount = Math.max(count, 2);
         // add items
         for (let i = 0; i < itemsCount; i++) {
             const item = this._getItem(i);

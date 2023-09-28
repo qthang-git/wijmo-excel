@@ -15,7 +15,7 @@ class App {
         this._lastId = 5;
         this._dataSvc = dataSvc;
         this._exportSvc = exportSvc;
-        this._objGroup = {};
+        this._autoNameGroup = 1;
         // initializes export
         const btnExportToExcel = document.getElementById('btnExportToExcel');
         this._excelExportContext = new ExcelExportContext(btnExportToExcel);
@@ -23,8 +23,8 @@ class App {
             const arrTestCase = this._itemsSource.sourceCollection.filter(item => item.status != 0);
             this._theGrid.worksheet_count = arrTestCase.length;
             this._theGrid.worksheet_index = arrTestCase.map(arr => arr.no);
-            this._theGrid.xlsx_name = $('#file-name').val();
-            this._theGrid.worksheet_name = $('#sheet-name').val();
+            this._theGrid.xlsx_name = $('#fileName').val();
+            this._theGrid.worksheet_name = $('#sheetName').val();
             this._theGrid._isCreateSheetChild = $('#flexCheckChecked').prop('checked');
             this._exportToExcel();
         });
@@ -34,7 +34,6 @@ class App {
         // initializes handle event
         this._handlerEvent();
         // initializes items source
-        this._numberSheet = $('#numOfSheet').val()
         this._itemsSource = this._createItemsSource();
         this._theGrid.itemsSource = this._itemsSource;
     }
@@ -43,35 +42,59 @@ class App {
         this._exportSvc.cancelExcelExport(ctx);
     }
     _handlerEvent() {
-        // hande field text #sheet-name
-        const sheetNameExcel = document.getElementById('sheet-name');
+        // hande field text #sheetName
+        const sheetNameExcel = document.getElementById('sheetName');
         sheetNameExcel.addEventListener('change', (event) => {
-            if ($(event.target).val().length > 15) {
+            if (event.target.value.length > 15) {
                 alert('Sheet name exceeds 15 characters');
-                $(event.target).val('');
-                $(event.target).focus();
+                event.target.value = '';
+                event.target.focus();
             }
         });
-        // handle clear button  
-        const btnClearAll = document.getElementById('clear-all');
+        // handle change field [number of sheet]
+        const numSheet = document.getElementById('numOfSheet');
+        numSheet.addEventListener('change', (evt) => {
+            let value = evt.target.value;
+            if(isNaN(value)){
+                evt.target.value = '';
+                return;
+            }
+            this._itemsSource = this._createItemsSource(parseInt(value) + 1);
+            this._theGrid.itemsSource = this._itemsSource;
+            this._itemsSource.refresh();
+        });
+        // handle btn-clear  
+        const btnClearAll = document.getElementById('btn-clear');
         btnClearAll.addEventListener('click', () => {
             let result = confirm('Delete everything (contains data in the list)');
             if (result) {
-                $('#file-name').val('');
-                $('#sheet-name').val('');
-                let itemsSource = this._itemsSource.sourceCollection;
-                let len = itemsSource.length;
-                for (let i = 0; i < len; i++) {
-                    itemsSource[i].operation = '';
-                    itemsSource[i].checklist = '';
-                    itemsSource[i].group = '';
-                }
-                this._theGrid.select(-1, -1);
-                this._itemsSource.refresh();
+                // clear file name
+                const FileName = document.getElementById('fileName');
+                FileName.value = '';
+                // clear sheet name
+                const SheetName = document.getElementById('sheetName');
+                SheetName.value = '';
+                // clear num of sheet
+                const NumOfSheet = document.getElementById('numOfSheet');
+                NumOfSheet.value = '';
+                NumOfSheet.dispatchEvent(new Event('change'));
+                // clear checkbox create child sheet
+                const ChkSheetChild = document.getElementById('flexCheckChecked');
+                ChkSheetChild.checked = false;
+                // clear data in list
+                // let itemsSource = this._itemsSource.sourceCollection;
+                // let len = itemsSource.length;
+                // for (let i = 0; i < len; i++) {
+                //     itemsSource[i].operation = '';
+                //     itemsSource[i].checklist = '';
+                //     itemsSource[i].group = '';
+                // }
+                // this._theGrid.select(-1, -1);
+                // this._itemsSource.refresh();
             }
         });
-        // handle sort 
-        const btnMoveUp = document.getElementById('upwards');
+        // handle btn-sort 
+        const btnMoveUp = document.getElementById('btn-upwards');
         btnMoveUp.addEventListener('click', () => {
             let scrollPosition = this._theGrid.scrollPosition;
             let source = this._itemsSource.sourceCollection;
@@ -87,7 +110,7 @@ class App {
             this._updateIndex(1, true);
             this._theGrid.scrollPosition = new wjcCore.Point(scrollPosition.x, scrollPosition.y);
         });
-        const btnMoveDown = document.getElementById('downwards');
+        const btnMoveDown = document.getElementById('btn-downwards');
         btnMoveDown.addEventListener('click', () => {
             let scrollPosition = this._theGrid.scrollPosition;
             let source = this._itemsSource.sourceCollection;
@@ -103,7 +126,33 @@ class App {
             this._updateIndex(1, true);
             this._theGrid.scrollPosition = new wjcCore.Point(scrollPosition.x, scrollPosition.y);
         });
-
+        // handle btn-group
+        const btnGroup = document.getElementById('btn-groups');
+        btnGroup.addEventListener('click', () => {
+            let selectedRows = this._theGrid.selectedRows;
+            let objGroup = this._theGrid._objGroup;
+            for (let key in objGroup) {
+                let Group = objGroup[key];
+                for (let i = 0; i < Group.length; i++) {
+                    if (selectedRows.findIndex(sld => sld.dataItem.group == key) != -1) {
+                        Group.splice(i, 1);
+                        i = -1;
+                    }
+                }
+                if (key == this._autoNameGroup) {
+                    this._autoNameGroup += 1;
+                }
+            }
+            for (let key in objGroup) {
+                if (objGroup[key].length == 0) {
+                    delete objGroup[key];
+                }
+            }
+            selectedRows.forEach(ele => {
+                ele.dataItem.group = this._autoNameGroup;
+            });
+            this._itemsSource.refresh();
+        });
     }
     _initializeGrid() {
         // creates columns
@@ -248,8 +297,8 @@ class App {
     //     let columnsCount = columns.length;
     //     columns.splice(columnsCount - 3, 3);
     // }
-    _createItemsSource() {
-        const data = this._dataSvc.getData(this._numberSheet || 11);
+    _createItemsSource(numberSheet) {
+        const data = this._dataSvc.getData(numberSheet || 11);
         const view = new wjcCore.CollectionView(data);
         view.collectionChanged.addHandler((s, e) => {
         });
@@ -287,9 +336,12 @@ class App {
             }
             // handle cell
             if (e.panel == s.cells) {
-                // remove [action button] if status is 0
-                if (item.status == 0 && (e.col == 10 || e.col == 11 || e.col == 12)) {
-                    e.cell.innerHTML = '';
+                // remove [action button] & [group] if status is 0
+                if (item.status == 0) {
+                    if (e.col == 4 || e.col == 9 || e.col == 10 || e.col == 11 || e.col == 12)
+                        e.cell.innerHTML = '';
+                    if (e.col == 4 || e.col == 9)
+                        e.cell.classList.add('wj-state-disabled')
                 }
                 for (let i = 0; i < data.length; i++) {
                     if (data[i].status != 0 && data[i].group != '') {

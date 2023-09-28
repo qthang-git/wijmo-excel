@@ -143,6 +143,7 @@ export class ExportService {
                 if (i == 0) { // header
                     style.hAlign = wjcXlsx.HAlign.Center;
                     style.borders.top.style = 1;
+                    style.font.bold = true;
                     if (j == 0) {
                         cell.colSpan = 2;
                         cell.value = 'No';
@@ -164,10 +165,13 @@ export class ExportService {
                         // cell.colSpan = countcells;
                         if (j < countcells - 1) {
                             style.borders.right.style = 0;
+                            // style.borders.bottom.style = 0;
                         }
                         cell.value = undefined;
                         if (j == 0) {
                             cell.value = cells[3].value;
+                            style.font.bold = true;
+
                         }
                     }
                     if (j == 0) {
@@ -286,7 +290,7 @@ export class ExportService {
         cellEmpty.colSpan = 0;
         cellEmpty.rowSpan = 0;
         cellEmpty.HAlign = wjcXlsx.HAlign.Left;
-        cellEmpty.value = '';
+        cellEmpty.value = undefined;
         return cellEmpty;
     }
     // initializes empty row
@@ -317,7 +321,7 @@ export class ExportService {
         return columnEmpty;
     }
     // initializes empty worksheet
-    _newEmptyWorkSheet(sheetname, row = 4, column = 20) {
+    _newEmptyWorkSheet(sheetname, i, row = 4, column = 20) {
         if (this._ws.filter(m => m.name == sheetname).length != 0) {
             return 0;
         }
@@ -331,11 +335,11 @@ export class ExportService {
             worksheet.rows.push(this._newEmptyRow(column));
         }
         // when exists group row
-        const keys = Object.keys(this._objGroup);
-        if (keys.length > 0) {
-            for (let i = 0; i < keys.length; i++) {
-                const group_row = this._objGroup[keys[i]];
-                for (let j = 1; j < group_row.length; j++) {
+        const objGroup = this._objGroup;
+        for (let key in objGroup) {
+            if (typeof objGroup[key].find(obj => obj == i) !== 'undefined') {
+                const GroupRow = objGroup[key];
+                for (let j = 1; j < GroupRow.length; j++) {
                     worksheet.rows.splice((j + 2), 0, this._newEmptyRow(column));
                 }
             }
@@ -359,7 +363,7 @@ export class ExportService {
             // if (hyperlink_cell != tempHyperLinkCell) 
             {
                 hyperlink_cell = tempHyperLinkCell;
-                let tmp = this._newEmptyWorkSheet(sheetname);
+                let tmp = this._newEmptyWorkSheet(sheetname, this._arr_wsindex[i]);
                 if (!(tmp == 0)) {
                     let worksheet = this._createContentForWS(flex, tmp, hyperlink_cell, i);
                     this._ws.push(worksheet);
