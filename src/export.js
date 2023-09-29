@@ -5,6 +5,9 @@ import * as wjcXlsx from '@grapecity/wijmo.xlsx';
 //
 const ExcelExportDocName = 'TEMPLATE-DEFAULT.xlsx';
 const ExcelExportSheetName = 'テスト仕様書';
+const BG_LIGHT_YELLOW = 'rgb(255, 242, 204)';
+const BG_LIGHT_GREEN = 'rgb(226, 239, 218)';
+const BG_LIGHT_PURPLE = 'rgb(217, 225, 242)';
 //
 export class ExportService {
     constructor() {
@@ -107,7 +110,7 @@ export class ExportService {
         for (let i = 0; i < countrows; i++) {
             let cells = this._wsrows[i].cells;
             cells.unshift(this._newEmptyCell());
-            this._wsrows[i].height = i == 0 ? this._convertToPixel(14.25) : this._wsrows[i].height > this._convertToPixel(18.75) ? this._wsrows[i].height : this._convertToPixel(18.75);
+            // this._wsrows[i].height = i == 0 ? this._convertToPixel(14.25) : this._wsrows[i].height > this._convertToPixel(18.75) ? this._wsrows[i].height : this._convertToPixel(18.75);
             let countcells = cells.length;
             let status_row = 1;
             if (i != 0) {
@@ -139,7 +142,8 @@ export class ExportService {
                 style.font.size = this._convertToPixel(10);
                 style.font.family = this._ws_font_family;
                 style.vAlign = wjcXlsx.VAlign.Center;
-                if (i == 0) { // header
+                // row_header
+                if (i == 0) {
                     style.hAlign = wjcXlsx.HAlign.Center;
                     style.borders.top.style = 1;
                     style.font.bold = true;
@@ -150,31 +154,36 @@ export class ExportService {
                     }
                     // fill background header column
                     if (j <= 5) {
-                        style.fill.color = 'rgb(226, 239, 218)';
+                        style.fill.color = BG_LIGHT_GREEN;
                     }
                     else {
-                        style.fill.color = 'rgb(217, 225, 242)';
+                        style.fill.color = BG_LIGHT_PURPLE;
                     }
                 }
                 else {
+                    // remove value "'" when if cell in grid is empty
+                    if (cell.value == "'") {
+                        // delete cell.value;
+                        cell.value = undefined;
+                    }
                     let previous_cell = this._wsrows[i - 1].cells[j];
                     if (status_row == 0) {
-                        this._wsrows[i].height = 19;
-                        style.fill.color = 'rgb(255, 242, 204)';
-                        // cell.colSpan = countcells;
+                        // this._wsrows[i].height = 19;
+                        style.fill.color = BG_LIGHT_YELLOW;
+                        style.borders.bottom.style = 0;
                         if (j < countcells - 1) {
                             style.borders.right.style = 0;
-                            // style.borders.bottom.style = 0;
                         }
                         cell.value = undefined;
                         if (j == 0) {
                             cell.value = cells[3].value;
                             style.font.bold = true;
-
                         }
+                    } else {
+                        style.borders.top.style = 1;
                     }
                     if (j == 0) {
-                        style.fill.color = 'rgb(255, 242, 204)';
+                        style.fill.color = BG_LIGHT_YELLOW;
                         style.borders.top.style = 0;
                         style.borders.left.style = 1;
                         if (i < countrows - 1) {
@@ -186,14 +195,10 @@ export class ExportService {
                     }
                     // begin from row 2
                     if (i > 1) {
-                        // remove value "'" when if cell in grid is empty
-                        if (cell.value == "'") {
-                            cell.value = undefined;
-                        }
                         style.format = 'General';
                         // column [no]
                         if (j == 1) {
-                            if (cell.value != undefined) {
+                            if (typeof cell.value !== 'undefined') {
                                 if (i != 2) {
                                     let minus_row = idxFomula != 0 ? ('-' + idxFomula) : '';
                                     cell.formula = '=OFFSET(INDIRECT(ADDRESS(ROW()' + minus_row + ',COLUMN())), -1, 0)+1';
@@ -203,7 +208,7 @@ export class ExportService {
                                     style.font.color = '#4F81BD';
                                     cell.link = "#'" + this._arr_wsname[cell.value - 1] + "'!B1";
                                 }
-                                if (previous_cell.value == undefined) {
+                                if (typeof previous_cell.value === 'undefined') {
                                     idxFomula = 0;
                                 }
                             } else {
@@ -213,6 +218,11 @@ export class ExportService {
                         // column [date]
                         else if (j == 6) {
                             style.format = 'yyyy-mm-dd';
+                        }
+                        // column [result]
+                        else if (j == 7) {
+                            style.font.hAlign = wjcXlsx.HAlign.Center;
+                            style.font.bold = true;
                         }
                     }
 
@@ -254,7 +264,7 @@ export class ExportService {
                         }
                     };
                     value = i == 1 ? '利用ブラウザ' : '環境';
-                    bgcolor = 'rgb(226, 239, 218)';
+                    bgcolor = BG_LIGHT_GREEN;
                     colSpan = 3;
                 }
                 [1, 2, 3, 4, 5, 6].forEach(item => {
@@ -289,14 +299,14 @@ export class ExportService {
         cellEmpty.colSpan = 0;
         cellEmpty.rowSpan = 0;
         cellEmpty.HAlign = wjcXlsx.HAlign.Left;
-        cellEmpty.value = undefined;
+        // cellEmpty.value = undefined;
         return cellEmpty;
     }
     // initializes empty row
     _newEmptyRow(countcells) {
         let rowEmpty = new wjcXlsx.WorkbookRow();
         rowEmpty.visible = true;
-        rowEmpty.height = 19;
+        // rowEmpty.height = 19;
         for (var i = 0; i < countcells; i++) {
             let _tempCell = this._newEmptyCell();
             _tempCell.style.font.family = this._ws_font_family;
@@ -370,10 +380,10 @@ export class ExportService {
         // get text '操作' from main sheet
         worksheet.rows[1].cells[1].formula = "='" + this._wsname + "'!E6";
         worksheet.rows[1].cells[1].colSpan = 10;
-        worksheet.rows[1].cells[1].style.fill.color = 'rgb(226, 239, 218)';
+        worksheet.rows[1].cells[1].style.fill.color = BG_LIGHT_GREEN;
         // get text '確認事項' from main sheet
         worksheet.rows[1].cells[11].formula = "='" + this._wsname + "'!G6";
-        worksheet.rows[1].cells[11].style.fill.color = 'rgb(226, 239, 218)';
+        worksheet.rows[1].cells[11].style.fill.color = BG_LIGHT_GREEN;
         worksheet.rows[1].cells[11].colSpan = 9;
         // hyperlink back to main sheet
         worksheet.rows[0].cells[1].style.font.underline = true;
