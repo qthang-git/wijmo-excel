@@ -64,7 +64,8 @@
             'bootstrap.css': 'npm:bootstrap/dist/css/bootstrap.min.css',
             'css': 'npm:systemjs-plugin-css/css.js',
             'plugin-babel': 'npm:systemjs-plugin-babel/plugin-babel.js',
-            'systemjs-babel-build':'npm:systemjs-plugin-babel/systemjs-babel-browser.js'
+            'systemjs-babel-build':'npm:systemjs-plugin-babel/systemjs-babel-browser.js',
+            'ua-parser-js':'npm:ua-parser-js/src/ua-parser.js',
         },
         // packages tells the System loader how to load when no filename and/or no extension
         packages: {

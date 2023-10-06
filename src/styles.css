@@ -1,6 +1,5 @@
 :root {
-    --width-center: 1000px;
-    --background-yellow: rgb(255, 242, 204);
+    --width-center: 1000px
 }
 
 .w800 {
@@ -15,10 +14,6 @@
 
 #theGrid {
     height: 700px;
-}
-
-.wj-background-yellow{
-    background: var(--background-yellow) !important;
 }
 
 .banner {

@@ -2,12 +2,10 @@ import * as wjcCore from '@grapecity/wijmo';
 import * as wjcGrid from '@grapecity/wijmo.grid';
 import * as wjcGridXlsx from '@grapecity/wijmo.grid.xlsx';
 import * as wjcXlsx from '@grapecity/wijmo.xlsx';
+import { UAParser } from 'ua-parser-js'; 
 //
 const ExcelExportDocName = 'TEMPLATE-DEFAULT.xlsx';
 const ExcelExportSheetName = 'テスト仕様書';
-const BG_LIGHT_YELLOW = 'rgb(255, 242, 204)';
-const BG_LIGHT_GREEN = 'rgb(226, 239, 218)';
-const BG_LIGHT_PURPLE = 'rgb(217, 225, 242)';
 //
 export class ExportService {
     constructor() {
@@ -22,6 +20,7 @@ export class ExportService {
         this._arr_wsname = [];
         this._arr_wsindex = [];
         this._objGroup = {};
+        this._userAgent = $.ua;
     }
     startExcelExport(flex, ctx) {
         if (ctx.preparing || ctx.exporting) {
@@ -107,14 +106,19 @@ export class ExportService {
         // template main
         let countrows = this._wsrows.length;
         let idxFomula = 0;
+
         for (let i = 0; i < countrows; i++) {
             let cells = this._wsrows[i].cells;
             cells.unshift(this._newEmptyCell());
-            // this._wsrows[i].height = i == 0 ? this._convertToPixel(14.25) : this._wsrows[i].height > this._convertToPixel(18.75) ? this._wsrows[i].height : this._convertToPixel(18.75);
+            this._wsrows[i].height = i == 0 ? this._convertToPixel(14.25) : this._wsrows[i].height > this._convertToPixel(18.75) ? this._wsrows[i].height : this._convertToPixel(18.75);
             let countcells = cells.length;
             let status_row = 1;
+            let status_prevRow;
             if (i != 0) {
                 status_row = flex.rows[i - 1].dataItem.status;
+                if (i >= 2) {
+                    status_prevRow = flex.rows[i - 2].dataItem.status;
+                }
             }
             for (let j = 0; j < countcells; j++) {
                 let cell = cells[j];
@@ -124,7 +128,7 @@ export class ExportService {
                 style.borders = {
                     top: {
                         color: '#000',
-                        style: 0
+                        style: 1
                     },
                     right: {
                         color: '#000',
@@ -142,8 +146,7 @@ export class ExportService {
                 style.font.size = this._convertToPixel(10);
                 style.font.family = this._ws_font_family;
                 style.vAlign = wjcXlsx.VAlign.Center;
-                // row_header
-                if (i == 0) {
+                if (i == 0) { // header
                     style.hAlign = wjcXlsx.HAlign.Center;
                     style.borders.top.style = 1;
                     style.font.bold = true;
@@ -154,23 +157,19 @@ export class ExportService {
                     }
                     // fill background header column
                     if (j <= 5) {
-                        style.fill.color = BG_LIGHT_GREEN;
+                        style.fill.color = 'rgb(226, 239, 218)';
                     }
                     else {
-                        style.fill.color = BG_LIGHT_PURPLE;
+                        style.fill.color = 'rgb(217, 225, 242)';
                     }
                 }
                 else {
-                    // remove value "'" when if cell in grid is empty
-                    if (cell.value == "'") {
-                        // delete cell.value;
-                        cell.value = undefined;
-                    }
                     let previous_cell = this._wsrows[i - 1].cells[j];
+                    let previous_style = previous_cell.style;
                     if (status_row == 0) {
-                        // this._wsrows[i].height = 19;
-                        style.fill.color = BG_LIGHT_YELLOW;
-                        style.borders.bottom.style = 0;
+                        this._wsrows[i].height = 19;
+                        style.fill.color = 'rgb(255, 242, 204)';
+                        style.borders.top.style = 0;
                         if (j < countcells - 1) {
                             style.borders.right.style = 0;
                         }
@@ -179,11 +178,12 @@ export class ExportService {
                             cell.value = cells[3].value;
                             style.font.bold = true;
                         }
-                    } else {
-                        style.borders.top.style = 1;
+                    }
+                    if (typeof status_prevRow !== 'undefined' && status_prevRow == 0) {
+                        previous_style.borders.bottom.style = 0;
                     }
                     if (j == 0) {
-                        style.fill.color = BG_LIGHT_YELLOW;
+                        style.fill.color = 'rgb(255, 242, 204)';
                         style.borders.top.style = 0;
                         style.borders.left.style = 1;
                         if (i < countrows - 1) {
@@ -195,10 +195,19 @@ export class ExportService {
                     }
                     // begin from row 2
                     if (i > 1) {
+                        // remove value "'" when if cell in grid is empty
+                        if (cell.value == "'") {
+                            cell.value = " ";
+                        }
+                        let height = 19;
+                        if (status_row != 0) {
+                            height = this._convertToPixel(40);
+                        }
+                        this._wsrows[i].height = height;
                         style.format = 'General';
                         // column [no]
                         if (j == 1) {
-                            if (typeof cell.value !== 'undefined') {
+                            if (cell.value != undefined) {
                                 if (i != 2) {
                                     let minus_row = idxFomula != 0 ? ('-' + idxFomula) : '';
                                     cell.formula = '=OFFSET(INDIRECT(ADDRESS(ROW()' + minus_row + ',COLUMN())), -1, 0)+1';
@@ -208,7 +217,7 @@ export class ExportService {
                                     style.font.color = '#4F81BD';
                                     cell.link = "#'" + this._arr_wsname[cell.value - 1] + "'!B1";
                                 }
-                                if (typeof previous_cell.value === 'undefined') {
+                                if (previous_cell.value == undefined) {
                                     idxFomula = 0;
                                 }
                             } else {
@@ -220,8 +229,9 @@ export class ExportService {
                             style.format = 'yyyy-mm-dd';
                         }
                         // column [result]
-                        else if (j == 7) {
-                            style.font.hAlign = wjcXlsx.HAlign.Center;
+                        else if (j == 8) {
+                            style.hAlign = wjcXlsx.HAlign.Center;
+                            style.vAlign = wjcXlsx.VAlign.Center;
                             style.font.bold = true;
                         }
                     }
@@ -264,7 +274,7 @@ export class ExportService {
                         }
                     };
                     value = i == 1 ? '利用ブラウザ' : '環境';
-                    bgcolor = BG_LIGHT_GREEN;
+                    bgcolor = 'rgb(226, 239, 218)';
                     colSpan = 3;
                 }
                 [1, 2, 3, 4, 5, 6].forEach(item => {
@@ -279,7 +289,7 @@ export class ExportService {
                     }
                     else if (item == 4) {
                         cells[item].colSpan = colSpan;
-                        cells[item].value = i == 1 ? 'FireFox 117.0 (64 ビット)' : '';
+                        cells[item].value = i == 1 ? this._getVersionBrowser() : '';
                     }
                 })
             }
@@ -299,14 +309,14 @@ export class ExportService {
         cellEmpty.colSpan = 0;
         cellEmpty.rowSpan = 0;
         cellEmpty.HAlign = wjcXlsx.HAlign.Left;
-        // cellEmpty.value = undefined;
+        cellEmpty.value = undefined;
         return cellEmpty;
     }
     // initializes empty row
     _newEmptyRow(countcells) {
         let rowEmpty = new wjcXlsx.WorkbookRow();
         rowEmpty.visible = true;
-        // rowEmpty.height = 19;
+        rowEmpty.height = 19;
         for (var i = 0; i < countcells; i++) {
             let _tempCell = this._newEmptyCell();
             _tempCell.style.font.family = this._ws_font_family;
@@ -330,7 +340,7 @@ export class ExportService {
         return columnEmpty;
     }
     // initializes empty worksheet
-    _newEmptyWorkSheet(sheetname, i, row = 4, column = 20) {
+    _newEmptyWorkSheet(sheetname, i, row = 4, column = 21) {
         if (this._ws.filter(m => m.name == sheetname).length != 0) {
             return;
         }
@@ -354,7 +364,11 @@ export class ExportService {
             }
         }
         for (let i = 0; i < column; i++) {
-            worksheet.columns.push(this._newEmptyColumn());
+            let width;
+            if (i == 0) {
+                width = 21;
+            }
+            worksheet.columns.push(this._newEmptyColumn(width));
         }
         worksheet.frozenPane = {};
         worksheet.frozenPane.rows = worksheet.rows.length;
@@ -376,22 +390,24 @@ export class ExportService {
     }
     // create content for worksheet child
     _createContentForWS(flex, worksheet, hyperlink_cell, row_item) {
+        let idxBorder = 4;
+        let colSpan = 10;
         // header with light green background
         // get text '操作' from main sheet
         worksheet.rows[1].cells[1].formula = "='" + this._wsname + "'!E6";
-        worksheet.rows[1].cells[1].colSpan = 10;
-        worksheet.rows[1].cells[1].style.fill.color = BG_LIGHT_GREEN;
+        worksheet.rows[1].cells[1].colSpan = colSpan;
+        worksheet.rows[1].cells[1].style.fill.color = 'rgb(226, 239, 218)';
         // get text '確認事項' from main sheet
         worksheet.rows[1].cells[11].formula = "='" + this._wsname + "'!G6";
-        worksheet.rows[1].cells[11].style.fill.color = BG_LIGHT_GREEN;
-        worksheet.rows[1].cells[11].colSpan = 9;
+        worksheet.rows[1].cells[11].style.fill.color = 'rgb(226, 239, 218)';
+        worksheet.rows[1].cells[11].colSpan = colSpan;
         // hyperlink back to main sheet
         worksheet.rows[0].cells[1].style.font.underline = true;
         worksheet.rows[0].cells[1].style.font.color = '#4F81BD';
         worksheet.rows[0].cells[1].value = '戻る';
         worksheet.rows[0].cells[1].link = "#'" + this._wsname + "'!C" + hyperlink_cell;
         // let item = flex.itemsSource.items.find(item => item.no == this._arr_wsindex[indexSheet]);
-        let idxBorder = 4;
+
         const keys = Object.keys(this._objGroup);
         if (keys.length > 0) {
             if (typeof row_item !== 'undefined' && row_item.group != '') {
@@ -400,9 +416,9 @@ export class ExportService {
                 for (let i = 0; i < len; i++) {
                     // get test case main -> child
                     worksheet.rows[i + 2].cells[1].formula = "='" + this._wsname + "'!E" + (hyperlink_cell + i);
-                    worksheet.rows[i + 2].cells[1].colSpan = 10;
+                    worksheet.rows[i + 2].cells[1].colSpan = colSpan;
                     worksheet.rows[i + 2].cells[11].formula = "='" + this._wsname + "'!G" + (hyperlink_cell + i);
-                    worksheet.rows[i + 2].cells[11].colSpan = 9;
+                    worksheet.rows[i + 2].cells[11].colSpan = colSpan;
                 }
             } else {
                 // get test case main -> child
@@ -413,14 +429,17 @@ export class ExportService {
             }
         } else {
             // get test case main -> child
-            worksheet.rows[2].cells[1].formula = "='" + this._wsname + "'!E" + hyperlink_cell;
-            worksheet.rows[2].cells[1].colSpan = 10;
-            worksheet.rows[2].cells[11].formula = "='" + this._wsname + "'!G" + hyperlink_cell;
-            worksheet.rows[2].cells[11].colSpan = 9;
+            [1, 11].forEach((val, idx) => {
+                worksheet.rows[2].cells[val].formula = "='" + this._wsname + (idx == 0 ? "'!E" : "'!G") + hyperlink_cell;
+                worksheet.rows[2].cells[val].colSpan = 10;
+                worksheet.rows[2].cells[val].height = 21;
+                worksheet.rows[2].cells[val].style.font.wordWrap = true;
+            })
         }
         // add border for cell
         for (let i = 1; i < idxBorder - 1; i++) {
-            for (let j = 1; j < 20; j++) {
+            let countColumns = worksheet.rows[i].cells.length;
+            for (let j = 1; j < countColumns; j++) {
                 worksheet.rows[i].cells[j].style.borders = {
                     top: {
                         color: '#000',
@@ -463,6 +482,11 @@ export class ExportService {
     // convert pixel to point (1 pixel = 0.75 point)
     _convertToPixel(point) {
         return point * 4 / 3;
+    }
+    // get version Browser
+    _getVersionBrowser() {
+        let browser = this._userAgent.browser;
+        return browser.name + " Version " + browser.version;
     }
     _resetExcelContext(ctx) {
         ctx.exporting = false;

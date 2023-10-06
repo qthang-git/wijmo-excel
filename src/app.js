@@ -9,9 +9,6 @@ import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
 import { DataService } from './data';
 import { ExportService } from './export';
 import 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js';
-const BG_LIGHT_YELLOW = 'rgb(255, 242, 204)';
-const BG_LIGHT_GREEN = 'rgb(226, 239, 218)';
-const BG_LIGHT_PURPLE = 'rgb(217, 225, 242)';
 //
 class App {
     constructor(dataSvc, exportSvc) {
@@ -302,24 +299,15 @@ class App {
             const Data = s.itemsSource.sourceCollection;
             const Item = Data[ID];
             const Group = s._objGroup[Item.group];
-            // handle panel TopLeft
-            if (e.panel == s.topLeftCells) {
-                e.cell.innerHTML = `<div title='Row Header' style='width: 100%; height: 100%; background: ${BG_LIGHT_YELLOW}; border: 1px solid grey'></div>`
-            }
             // handle column header
-            else if (e.panel == s.columnHeaders) {
+            if (e.panel == s.columnHeaders) {
                 if (e.row == 0) {
                     e.cell.style.textAlign = 'center';
                 }
             }
             // handle row header
-            else if (e.panel == s.rowHeaders) {
+            if (e.panel == s.rowHeaders) {
                 e.cell.innerHTML = '<input class="row-checkbox" id="chk_' + ID + '" type="checkbox" ' + (Item.status != 1 ? 'checked' : '') + '>';
-                if(Item.status == 0){
-                    e.cell.classList.add('wj-background-yellow');
-                }else{
-                    e.cell.classList.remove('wj-background-yellow');
-                }
                 if (e.row == 0 && e.col == 0) {
                     e.cell.classList.add('wj-state-disabled');
                 }
@@ -345,16 +333,13 @@ class App {
                 });
             }
             // handle cell
-            else if (e.panel == s.cells) {
+            if (e.panel == s.cells) {
                 // remove [action button] & [group] if status is 0
                 if (Item.status == 0) {
-                    e.cell.classList.add('wj-background-yellow');
                     if (e.col == 4 || e.col == 9 || e.col == 10 || e.col == 11 || e.col == 12)
                         e.cell.innerHTML = '';
                     if (e.col == 4 || e.col == 9)
-                        e.cell.classList.add('wj-state-disabled');
-                }else{
-                    e.cell.classList.remove('wj-background-yellow');
+                        e.cell.classList.add('wj-state-disabled')
                 }
                 for (let i = 0; i < Data.length; i++) {
                     if (Data[i].status != 0 && Data[i].group != '') {
