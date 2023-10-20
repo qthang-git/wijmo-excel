@@ -41,6 +41,7 @@ class App {
         const ctx = this._excelExportContext;
         this._exportSvc.cancelExcelExport(ctx);
     }
+    // initializes handle event
     _handlerEvent() {
         // hande field text #sheetName
         const sheetNameExcel = document.getElementById('sheetName');
@@ -143,7 +144,17 @@ class App {
             });
             this._itemsSource.refresh();
         });
+        // handle btn-add-worksheet
+        const btnAddWS = document.getElementById('add-workwheet');
+        btnAddWS.addEventListener('click', (evt) => {
+            let wslist = document.getElementById('wslist');
+            let tabindex = parseInt(evt.target.getAttribute('tabindex'));
+            let html = `<div class="wsheet ${$('body').hasClass('dark-theme') ? 'dark' : ''}" id="sheet${tabindex}">Sheet ${tabindex}</div>`;
+            wslist.innerHTML += html;
+            evt.target.setAttribute('tabindex', tabindex + 1);
+        });
     }
+    // initializes the grid
     _initializeGrid() {
         // creates columns
         this._columns = [
@@ -163,7 +174,7 @@ class App {
                     text: [
                         '<div style="text-align: center;display: table;width: 100%;height: 100%;">',
                         '<div style="display: table-cell;vertical-align: middle;">',
-                        `<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'><svg enable-background="new 0 0 512 512" height="512px" id="Layer_1" version="1.1" viewBox="0 0 512 512" width="512px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M256,512C114.625,512,0,397.391,0,256C0,114.609,114.625,0,256,0c141.391,0,256,114.609,256,256  C512,397.391,397.391,512,256,512z M256,64C149.969,64,64,149.969,64,256s85.969,192,192,192c106.047,0,192-85.969,192-192  S362.047,64,256,64z M288,384h-64v-96h-96v-64h96v-96h64v96h96v64h-96V384z"/></svg>`,
+                        `<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'><svg ${$("#theGrid").hasClass('dark') ? 'dark' : ''} enable-background="new 0 0 512 512" height="512px" id="Layer_1" version="1.1" viewBox="0 0 512 512" width="512px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M256,512C114.625,512,0,397.391,0,256C0,114.609,114.625,0,256,0c141.391,0,256,114.609,256,256  C512,397.391,397.391,512,256,512z M256,64C149.969,64,64,149.969,64,256s85.969,192,192,192c106.047,0,192-85.969,192-192  S362.047,64,256,64z M288,384h-64v-96h-96v-64h96v-96h64v96h96v64h-96V384z"/></svg>`,
                         '</div>',
                         '</div>'
                     ].join(""),
@@ -178,7 +189,7 @@ class App {
                     text: [
                         '<div style="text-align: center;display: table;width: 100%;height: 100%;">',
                         '<div style="display: table-cell;vertical-align: middle;">',
-                        `<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'><svg enable-background="new 0 0 512 512" height="512px" id="Layer_1" version="1.1" viewBox="0 0 512 512" width="512px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><g><path d="M256,0C114.625,0,0,114.625,0,256c0,141.391,114.625,256,256,256c141.391,0,256-114.609,256-256    C512,114.625,397.391,0,256,0z M256,448c-106.031,0-192-85.969-192-192S149.969,64,256,64c106.047,0,192,85.969,192,192    S362.047,448,256,448z M128,288h256v-64H128V288z"/></g></g></svg>`,
+                        `<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'><svg ${$("#theGrid").hasClass('dark') ? 'dark' : ''} enable-background="new 0 0 512 512" height="512px" id="Layer_1" version="1.1" viewBox="0 0 512 512" width="512px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><g><path d="M256,0C114.625,0,0,114.625,0,256c0,141.391,114.625,256,256,256c141.391,0,256-114.609,256-256    C512,114.625,397.391,0,256,0z M256,448c-106.031,0-192-85.969-192-192S149.969,64,256,64c106.047,0,192,85.969,192,192    S362.047,448,256,448z M128,288h256v-64H128V288z"/></g></g></svg>`,
                         '</div>',
                         '</div>'
                     ].join(""),
@@ -193,7 +204,7 @@ class App {
                     text: [
                         '<div style="text-align: center;display: table;width: 100%;height: 100%;">',
                         '<div style="display: table-cell;vertical-align: middle;">',
-                        `<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'><svg enable-background="new 0 0 512 512" height="512px" id="Layer_1" version="1.1" viewBox="0 0 512 512" width="512px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><g><path d="M480,0H224c-17.688,0-32,14.312-32,32v256c0,17.688,14.312,32,32,32h256c17.688,0,32-14.312,32-32V32    C512,14.312,497.688,0,480,0z M448,256H256V64h192V256z M256,448H64V256h64v-64H32c-17.688,0-32,14.312-32,32v256    c0,17.688,14.312,32,32,32h256c17.688,0,32-14.312,32-32v-96h-64V448z"/></g></g></svg>`,
+                        `<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'><svg ${$("#theGrid").hasClass('dark') ? 'dark' : ''} enable-background="new 0 0 512 512" height="512px" id="Layer_1" version="1.1" viewBox="0 0 512 512" width="512px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><g><path d="M480,0H224c-17.688,0-32,14.312-32,32v256c0,17.688,14.312,32,32,32h256c17.688,0,32-14.312,32-32V32    C512,14.312,497.688,0,480,0z M448,256H256V64h192V256z M256,448H64V256h64v-64H32c-17.688,0-32,14.312-32,32v256    c0,17.688,14.312,32,32,32h256c17.688,0,32-14.312,32-32v-96h-64V448z"/></g></g></svg>`,
                         '</div>',
                         '</div>'
                     ].join(""),
@@ -286,19 +297,25 @@ class App {
             this._exportSvc.cancelExcelExport(ctx);
         }
     }
+    // create itemsource
     _createItemsSource(numberSheet) {
-        const data = this._dataSvc.getData(numberSheet || 11);
+        const data = this._dataSvc.getData(numberSheet || 3);
         const view = new wjcCore.CollectionView(data);
         view.collectionChanged.addHandler((s, e) => {
         });
         return view;
     }
+    // handle event formatItem
     _formatItem() {
         this._theGrid.formatItem.addHandler(function (s, e) {
+            const root = s._e;
             const ID = e.row;
             const Data = s.itemsSource.sourceCollection;
             const Item = Data[ID];
             const Group = s._objGroup[Item.group];
+            if ($("#theGrid").hasClass('dark')) {
+                $(e.cell).addClass('dark');
+            }
             // handle column header
             if (e.panel == s.columnHeaders) {
                 if (e.row == 0) {
@@ -307,9 +324,14 @@ class App {
             }
             // handle row header
             if (e.panel == s.rowHeaders) {
-                e.cell.innerHTML = '<input class="row-checkbox" id="chk_' + ID + '" type="checkbox" ' + (Item.status != 1 ? 'checked' : '') + '>';
+                // e.cell.innerHTML = '<input class="row-checkbox" id="chk_' + ID + '" type="checkbox" ' + (Item.status != 1 ? 'checked' : '') + '>';
+                e.cell.innerHTML = `
+                    <input class="row-checkbox ${$("#theGrid").hasClass('dark') ? 'dark' : ''}" type="checkbox" value="" id="chk_${ID}" ${Item.status != 1 ? 'checked' : ''} style="display: none;">
+                    <label class="label-checkbox ${$("#theGrid").hasClass('dark') ? 'dark' : ''}" for="chk_${ID}"></label>
+                `;
                 if (e.row == 0 && e.col == 0) {
                     e.cell.classList.add('wj-state-disabled');
+                    e.cell.style.opacity = 1;
                 }
                 $('#chk_' + ID).off('click').on('click', function (event) {
                     if (Item.group != '') {
@@ -339,7 +361,11 @@ class App {
                     if (e.col == 4 || e.col == 9 || e.col == 10 || e.col == 11 || e.col == 12)
                         e.cell.innerHTML = '';
                     if (e.col == 4 || e.col == 9)
-                        e.cell.classList.add('wj-state-disabled')
+                        e.cell.classList.add('wj-state-disabled');
+                }
+                if (e.col == 10 || e.col == 11 || e.col == 12) {
+                    $(e.cell).addClass($('body').hasClass('dark-theme') ? 'dark' : '');
+                    $(e.cell).children().addClass($('body').hasClass('dark-theme') ? 'dark' : '');
                 }
                 for (let i = 0; i < Data.length; i++) {
                     if (Data[i].status != 0 && Data[i].group != '') {

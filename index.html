@@ -17,9 +17,9 @@
 </head>
 
 <body>
-    <div class="container-fluid">
+    <div class="container-fluid" id="main-section">
         <br>
-        <div class="row div-center w800" style="margin-bottom: 10px">
+        <div class="row div-center w1000" style="margin-bottom: 10px">
             <div class="toolbar-item col-sm-5 col-md-5">
                 <div class="input-group">
                     <input id="fileName" type="text" class="form-control" placeholder="Enter file name"
@@ -39,16 +39,18 @@
                 </div>
             </div>
             <div class="toolbar-item col-sm-2 col-md-2">
-                <button id="btn-clear" class="btn btn-primary btn-default float-right">Clear All</button>
+                <button id="btn-clear" class="btn btn-primary btn-default">Clear All</button>
+                <button id="btn-switch" class="icon icon-moon float-right" onclick="switchMode(event)">
+                </button>
             </div>
         </div>
-        <div class="row div-center w800" style="margin-bottom: 10px">
+        <div class="row div-center w1000" style="margin-bottom: 10px">
             <div class="col-sm-12 col-md-12">
                 <div class="custom-bar">
                     <div class="div-checkbox">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
-                            style="display: none;">
-                        <label class="form-check-label" for="flexCheckChecked">
+                        <input class="form-check-input custom-checkbox" type="checkbox" value="" id="flexCheckChecked"
+                            checked style="display: none;">
+                        <label class="form-check-label custom-checkbox" for="flexCheckChecked">
                             Create child sheet
                         </label>
                     </div>
@@ -59,9 +61,24 @@
                 </div>
             </div>
         </div>
+        <div class="row div-center w1000" style="margin: 10px auto">
+            <!-- export to Excel -->
+            <div class="toolbar-item col-sm-2 col-md-2">
+                <button id="btnExportToExcel" class="btn btn-info btn-default">Export To Excel</button>
+            </div>
+            <div class="toolbar-item col-sm-10 col-md-10">
+            </div>
+        </div>
         <!-- the grid -->
-        <div class="row div-center w800">
-            <div class="col-sm-11 col-md-11">
+        <div class="row div-center w1200">
+            <div class="col-sm-1 col-md-1 wslist">
+                <div class="" id="wslist">
+                    <div class="wsheet active" id="sheet1">Sheet 1</div>
+                </div>
+                <div id="add-workwheet" class="cus-icon-plus" tabindex="2">
+                </div>
+            </div>
+            <div class="col-sm-10 col-md-10">
                 <div id="theGrid">
                 </div>
             </div>
@@ -80,13 +97,43 @@
             </div>
         </div>
         <br>
-        <div class="row div-center w800">
-            <!-- export to Excel -->
-            <div class="toolbar-item col-sm-4 col-md-3">
-                <button id="btnExportToExcel" class="btn btn-info btn-default">Export To Excel</button>
-            </div>
-        </div>
     </div>
 </body>
+<script>
+    function switchMode(event) {
+        var _this = event.target;
+        var switch_icon = 'icon-moon';
+        if (_this.classList.contains('icon-moon')) {
+            _this.classList.remove('icon-moon');
+            switch_icon = 'icon-sun';
+        } else {
+            _this.classList.remove('icon-sun');
+            switch_icon = 'icon-moon';
+        }
+        _this.classList.add(switch_icon);
+        document.body.classList.toggle('dark-theme');
+        var except = 'script, link, style, br, svg *, .icon';
+        var white_color = 'rgb(255, 255, 255)';
+        var set_bgColor = $('body').hasClass('dark-theme') ? '#181818' : white_color;
+        var every_thing = document.querySelectorAll('body *:not(' + except + ')');
+        every_thing.forEach((element, index) => {
+            var background = $(element).css('background-color');
+            var color = $(element).css('color');
+            if ($(element).css('display') != 'none') {
+                if ($('body').hasClass('dark-theme')) {
+                    if (background == white_color || color == white_color) {
+                        $(element).addClass('dark');
+                    }
+                    if ($(element).css('border-color') != null) {
+                        $(element).addClass('dark');
+                    }
+                } else {
+                    $(element).removeClass('dark');
+                }
+            }
+        });
+
+    }
+</script>
 
 </html>

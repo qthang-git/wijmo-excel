@@ -6,6 +6,9 @@ import { UAParser } from 'ua-parser-js';
 //
 const ExcelExportDocName = 'TEMPLATE-DEFAULT.xlsx';
 const ExcelExportSheetName = 'テスト仕様書';
+const BG_LIGHT_YELLOW = 'rgb(255, 242, 204)';
+const BG_LIGHT_GREEN = 'rgb(226, 239, 218)';
+const BG_LIGHT_PURPLE = 'rgb(217, 225, 242)';
 //
 export class ExportService {
     constructor() {
@@ -157,18 +160,18 @@ export class ExportService {
                     }
                     // fill background header column
                     if (j <= 5) {
-                        style.fill.color = 'rgb(226, 239, 218)';
+                        style.fill.color = BG_LIGHT_GREEN;
                     }
                     else {
-                        style.fill.color = 'rgb(217, 225, 242)';
+                        style.fill.color = BG_LIGHT_PURPLE;
                     }
                 }
                 else {
                     let previous_cell = this._wsrows[i - 1].cells[j];
                     let previous_style = previous_cell.style;
                     if (status_row == 0) {
-                        this._wsrows[i].height = 19;
-                        style.fill.color = 'rgb(255, 242, 204)';
+                        this._wsrows[i].height = 20;
+                        style.fill.color = BG_LIGHT_YELLOW;
                         style.borders.top.style = 0;
                         if (j < countcells - 1) {
                             style.borders.right.style = 0;
@@ -183,7 +186,7 @@ export class ExportService {
                         previous_style.borders.bottom.style = 0;
                     }
                     if (j == 0) {
-                        style.fill.color = 'rgb(255, 242, 204)';
+                        style.fill.color = BG_LIGHT_YELLOW;
                         style.borders.top.style = 0;
                         style.borders.left.style = 1;
                         if (i < countrows - 1) {
@@ -199,9 +202,9 @@ export class ExportService {
                         if (cell.value == "'") {
                             cell.value = " ";
                         }
-                        let height = 19;
+                        let height = 20;
                         if (status_row != 0) {
-                            height = this._convertToPixel(40);
+                            height = 53;
                         }
                         this._wsrows[i].height = height;
                         style.format = 'General';
@@ -274,7 +277,7 @@ export class ExportService {
                         }
                     };
                     value = i == 1 ? '利用ブラウザ' : '環境';
-                    bgcolor = 'rgb(226, 239, 218)';
+                    bgcolor = BG_LIGHT_GREEN;
                     colSpan = 3;
                 }
                 [1, 2, 3, 4, 5, 6].forEach(item => {
@@ -309,14 +312,13 @@ export class ExportService {
         cellEmpty.colSpan = 0;
         cellEmpty.rowSpan = 0;
         cellEmpty.HAlign = wjcXlsx.HAlign.Left;
-        cellEmpty.value = undefined;
+        // cellEmpty.value = undefined;
         return cellEmpty;
     }
     // initializes empty row
     _newEmptyRow(countcells) {
         let rowEmpty = new wjcXlsx.WorkbookRow();
         rowEmpty.visible = true;
-        rowEmpty.height = 19;
         for (var i = 0; i < countcells; i++) {
             let _tempCell = this._newEmptyCell();
             _tempCell.style.font.family = this._ws_font_family;
@@ -370,9 +372,6 @@ export class ExportService {
             }
             worksheet.columns.push(this._newEmptyColumn(width));
         }
-        worksheet.frozenPane = {};
-        worksheet.frozenPane.rows = worksheet.rows.length;
-        worksheet.frozenPane.columns = 0;
         return worksheet;
     }
     // add child worksheet into main worksheet
@@ -396,10 +395,10 @@ export class ExportService {
         // get text '操作' from main sheet
         worksheet.rows[1].cells[1].formula = "='" + this._wsname + "'!E6";
         worksheet.rows[1].cells[1].colSpan = colSpan;
-        worksheet.rows[1].cells[1].style.fill.color = 'rgb(226, 239, 218)';
+        worksheet.rows[1].cells[1].style.fill.color = BG_LIGHT_GREEN;
         // get text '確認事項' from main sheet
         worksheet.rows[1].cells[11].formula = "='" + this._wsname + "'!G6";
-        worksheet.rows[1].cells[11].style.fill.color = 'rgb(226, 239, 218)';
+        worksheet.rows[1].cells[11].style.fill.color = BG_LIGHT_GREEN;
         worksheet.rows[1].cells[11].colSpan = colSpan;
         // hyperlink back to main sheet
         worksheet.rows[0].cells[1].style.font.underline = true;
@@ -407,6 +406,7 @@ export class ExportService {
         worksheet.rows[0].cells[1].value = '戻る';
         worksheet.rows[0].cells[1].link = "#'" + this._wsname + "'!C" + hyperlink_cell;
         // let item = flex.itemsSource.items.find(item => item.no == this._arr_wsindex[indexSheet]);
+        let master_sheet = this._ws[0];
 
         const keys = Object.keys(this._objGroup);
         if (keys.length > 0) {
@@ -423,17 +423,19 @@ export class ExportService {
             } else {
                 // get test case main -> child
                 worksheet.rows[2].cells[1].formula = "='" + this._wsname + "'!E" + hyperlink_cell;
-                worksheet.rows[2].cells[1].colSpan = 10;
+                worksheet.rows[2].cells[1].colSpan = colSpan;
                 worksheet.rows[2].cells[11].formula = "='" + this._wsname + "'!G" + hyperlink_cell;
-                worksheet.rows[2].cells[11].colSpan = 9;
+                worksheet.rows[2].cells[11].colSpan = colSpan;
             }
         } else {
             // get test case main -> child
             [1, 11].forEach((val, idx) => {
                 worksheet.rows[2].cells[val].formula = "='" + this._wsname + (idx == 0 ? "'!E" : "'!G") + hyperlink_cell;
-                worksheet.rows[2].cells[val].colSpan = 10;
-                worksheet.rows[2].cells[val].height = 21;
-                worksheet.rows[2].cells[val].style.font.wordWrap = true;
+                // worksheet.rows[2].cells[val].value = master_sheet.rows[hyperlink_cell-1].cells[(idx == 0 ? 4 : 6)].value;
+                worksheet.rows[2].cells[val].colSpan = colSpan;
+                worksheet.rows[2].height = 53;
+                worksheet.rows[2].cells[val].style.wordWrap = true;
+                worksheet.rows[2].cells[val].style.vAlign = wjcXlsx.VAlign.Center;
             })
         }
         // add border for cell
@@ -460,6 +462,9 @@ export class ExportService {
                 }
             }
         }
+        worksheet.frozenPane = {};
+        worksheet.frozenPane.rows = worksheet.rows.length;
+        worksheet.frozenPane.columns = 0;
         return worksheet;
     }
     // show all columns on the grid

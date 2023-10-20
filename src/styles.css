@@ -2,9 +2,72 @@
     --width-center: 1000px
 }
 
-.w800 {
-    max-width: var(--width-center);
-    min-width: var(--width-center);
+body>div:last-child {
+    display: none;
+}
+
+.dark-theme {
+    background-color: #181818;
+}
+
+.icon {
+    width: 35px;
+    height: 35px;
+    border: 0;
+    background-color: #fff;
+    background-size: contain;
+    border: 1px solid #fff;
+    border-radius: 100%;
+}
+
+.icon:hover {
+    cursor: pointer;
+}
+
+.icon-sun {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAABTJJREFUaEPtWUtsVFUY/v4z0NakUmMq0859MCTV0CEuSI26Y6ErHwtRY1FWGBR0JfhMVIouVCLqBq2FqImiaAQXPnZEt2hgYXgpjZR7z9ySDpGXZOzj3t+cmXvbaymdc+90MDU9q8nMf/7zff/r/P8ZwjxfNM/xY4HAf+3BRnpAmKb5qCIopdwDgBtBtmEETNNcR8SfKtDMtC4kMeccGkbAts0+Zt6qEBPRNseRfXOOXuluhFKlc4GApmW1PdDVdeOS8fFm4/Tp4eM6utPmgG13FJqaxuTg4J8Xdc7RIqDAj462HAXIJOJdjuNtBBDUOIDCKsRSyi80qpCw7Vw/M20AWJbLY4WzZ89eqkVCi4CyCnPm6JQy+sh15QYNErXOj34XlmXuAnj95BciKOh4W4tANSlzA1XrVBcRbXcc+YIuwtnkbNvczszPTemuePkJHd3aBAD8y0pBgOPFYrEw0yHKY0GwaBURLw3vgZFMxj98NYuapnGcCCtC0yTybhICSr+wbfONIMB9QvA2xyl+FRHI5/Mtvj/+NMAbAeqa2Xp8EqD+5ubrdg4ODo5GMpaVe4RZvCoEvnMc+VKS0ExKYEZchmHcSYS9RFim4/YgwBAR9UopD+rIzyZTNwHTNB8Egs+IqCU6iJnPAXyAWThCBMQMC6C7ieiGmMzfgHhMSrm/HhJ1Eahann+MwDNjBKCXs9nsJ4cOHRqPA+vp6VlcKp1Zz4zXAdxUzQ1WJFZLKX9OSyI1ARXzExPjJ2Jhc8T3+R7P89zZwORyOVsI/EBEK8MEP9XS0tIdz4kkZFITsCxjC4C3qyAwEgR8Wy3wEbDlyzuXTUyIXyJPANjsusV3kwCfLLlpNqk9lpX7HaCbQytukFLuTqLLto0nmdFf3cODrutVdCVdqTxg2/ZKZv9IGMfnstnO7PSYrwWkUCg0Xbx4foSI2pSs0Lx5p+udiUBlkhICRiQcBCjGpyrLyq0F6PMqgeBrKYcfrgV4pt8ty9gHYE3ohbWu6+0N5WpiuGoIxbvI+KHxqSoe/wB2uG7x2TQEDMPYIQQ2h3u3uG7xHfVZB8P/l4Dq06ptcHDrlFXFr/GWOB5CRNjnOMWH0njAsnL7AXpghhCqiaGuKhRvr5n5fDbbubTeJM5kuHtoyDuR1BCpqlC1jBq/AbhFfSbCRscpfpjkcMvKPQXQztD6J13Xq+hKuuohoJJvR3hgyfcrF5mjAyCf78j7fkZdZO2hAZ5xnOJ7Ont1yqiWnq6uruZyuXxCCOSr5ZSPLl7M9546NXx6NgUK/MTEou+JuDJLMOOPJUvauo8dOzamdfA0odQeCMvdHUDwU6wTLRHhldbWto+nA1IX16VLFx4H8FpkeYDLQGa167rKG6lWXQRCEmuAYM+0dvoCER0AgtAbYhkz3xXdumHcl5kr7fQ3qZCHm+omEJK4HVADDS/XAaPChkj01mP56JykBNRI+WYQ8P1E3Oe63peRIpUTY2PlTczYFFWnKxKOoCpXf2tr2/vxELOsXC8zbRWCvnUc+WKjRkrtoT6fz63wfawCqCMMlzO+j8Oe5ykCV6xrMtQ3+FnlLWZ+fjIsiHc7jjf5hDNbWGqF0DV62BoAWFWpytJtr7UIxJ8WmTEgZVHFea2nxaR/cAjTND4ggnrQcsvl0ZVz9rSoLNLe3n59a2uToduvpH3cVflz+fK4LJVKf+lUNC0P6CiaLrPw/4Cm1RY8cDVDpc0BTcNPijXMA1OTHXT/4EiKvSLfSAKpACXdtEAgqcXmWn7ee+AfR+qxT9UvzUQAAAAASUVORK5CYII=');
+}
+
+.icon-moon {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAA/tJREFUaEPtV0uIHFUUPefV9Hw0isRMitQvExkRTHBhMi5cSVARdSEIESW4SQiIGDdBULIYUSJBmEXED4RxJwZdBIIIIcSgi1HREQkiYlxk6r3uCUIWahYm6bwr1V1t2nHGqarXogNVq3pd9757Pvd9mljjD9c4ftQE/msHawdqBxwVqFvIUUDn9NoBZwkdJ6gd6BcwjuMpQJ4mcS5NzRFHcQulD8SBOI63WWtnlMIDvaqk3ZGmi/OFUDgEORNIknCXCGYBrOvHQV7bmqYXvnfAVijViUAch88AeBP466VQRBaNaQWFEDgGVSaweXO401qcBDCUY7gI4Nb8/VOtm/c5YiuUXolAEAQ3KIVzJDsqi2DO83DIWnyUjUn7cZouPlIIgWNQJQJRFLxA8nAXvLSGhoa3t9vthJQvuwTweZo273XEVii9CgFGUWCuqy97jWnNbtmy0W+3G4sZfhH+6vv+hvn5+auFUDgElSYQx/EOwH6Vq3/BmFYMoJ2Noyj4juTWrgvyYJq2TjlgK5RamkB/+wB8V2uzp1cpjqPXATnQHctJrVsPFULhEFSaQJIER0T4XNcB7jfGvNGrH4ZhRMpPJEfytbArTZsfOuBbNbU0gTAMjymFJ3KVn9S6day/Sj9BAJcAtVNr3Wm5f+MpTSBJgqMi3Js7sM8Yc7QfmO/7Nw4Pe3MA78p/v0RiT5o2P/hfEIjj8BUAB3Mwr2ndfGkpsCRJbhO59gWA8d43a3GK5Izv+6eX7E5MkuROERnTWn9dlmRpB+I4eAzg8bzQN1o3ty9XtEuifbzPiU4Yid9E8AOAX6zFqFK4o0d06ZoqQqY0gaxFGg3vYr5QhbRTK906x8fH142NNbITel9vYa8C6i2tm88WAd6LKU0gS4zj4D2AT3XXAU4b08yu0bJS4Wx3UorPA5Jtq9k5sUJdNVW2jSoRiKLodlKyq3LnIici08a0Xi6inO/7G0dGVCzC7ACcBbg+39EqnRuVCHRdCA8BeDEHnan/qtbNaQB2NSLda4d3AlD35AJczt6NMWdXy136vTIBAF6SbDohoh7+sx9pz5A8uLDQmlsOyMTExGi73d5N2sPXle842LlPlQXf2RSqJPVyJifX33zlysj7/STydjgrwjOk/CiCy0qpDYBss1YeJXlLL19ErpLcr3Xznao4nAjkRb3sbBCRAyQbJYBoQO3WWn9WIudvoYMg0Jk0iqJJpey0tXic5OjKoMQAnPG8xtvnz5//3QW8cwstVzz7t+Z5uJ9Ud1srm0jeJCI/k9BKyScLC61v/2nLLUtoYA6ULTyo+JrAoJSsOk/tQFXlBpVXOzAoJavOUztQVblB5dUODErJqvOseQf+AJxMW0CZus7TAAAAAElFTkSuQmCC');
+}
+
+/* .wj-flexgrid.dark-theme {
+    border-color: #fff !important;
+    background-color: #181818 !important;
+}
+
+.wj-flexgrid.dark-theme * {
+    border-color: #fff !important;
+    background-color: #181818 !important;
+    color: #fff !important;
+}
+
+.wj-flexgrid.dark-theme .wj-cell .wj-cell-maker svg {
+    stroke: #fff !important;
+    fill: #fff !important;
+} */
+
+.dark {
+    background-color: #181818 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+svg.dark,
+.wj-cell-maker.dark svg {
+    fill: #fff !important;
+    /* stroke: #fff !important; */
+}
+
+.w1000 {
+    max-width: 1000px;
+    min-width: 1000px;
+}
+
+.w1200 {
+    max-width: 1200px;
+    min-width: 1200px;
 }
 
 .div-center {
@@ -25,7 +88,7 @@
 }
 
 .btn-default {
-    border: 0 !important;
+    /* border: 0 !important; */
     border-radius: 0 !important;
     outline: 0 !important;
 }
@@ -82,13 +145,13 @@
     border-radius: 0;
 }
 
-label[for="flexCheckChecked"] {
+label[class*="custom-checkbox"] {
     margin: 0 0 0 25px;
     position: relative;
     user-select: none;
 }
 
-label[for="flexCheckChecked"]:before {
+label[class*="custom-checkbox"]:before {
     content: '';
     height: 20px;
     width: 20px;
@@ -98,7 +161,7 @@ label[for="flexCheckChecked"]:before {
     top: 0;
 }
 
-label[for="flexCheckChecked"]:after {
+label[class*="custom-checkbox"]:after {
     content: '✓';
     height: 20px;
     width: 20px;
@@ -108,11 +171,107 @@ label[for="flexCheckChecked"]:after {
     display: none;
 }
 
-input#flexCheckChecked:checked+label[for="flexCheckChecked"]:after {
+input.custom-checkbox:checked+label[class*="custom-checkbox"]:after {
+    display: block;
+}
+
+label.label-checkbox {
+    width: 13px;
+    height: 13px;
+    border: 1px solid #181818;
+    position: relative;
+}
+
+label.label-checkbox:before {
+    content: '✓';
+    color: #181818;
+    height: 13px;
+    width: 13px;
+    font-size: 10px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+label.label-checkbox.dark,
+label.label-checkbox.dark:before{
+    border-color: #fff;
+    color: #fff;
+}
+
+input.row-checkbox:checked+label.label-checkbox:before {
     display: block;
 }
 
 a[rel="noopener"],
 div[style^="position: fixed"] {
     display: none;
+}
+
+.wslist {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.wsheet {
+    padding: 5px 10px;
+    background-color: #fff;
+    border: 2px solid #5cb85c;
+    color: #5cb85c;
+    user-select: none;
+    margin-bottom: 10px;
+}
+
+.wsheet:hover {
+    background-color: #5cb85c;
+    color: #fff;
+    cursor: pointer;
+}
+
+.wsheet.active {
+    background-color: #5cb85c;
+    border-color: #5cb85c;
+    color: #fff;
+}
+
+.cus-icon-plus {
+    position: relative;
+    background-color: #5bc0de;
+    border: 2px solid #5bc0de;
+    width: 100%;
+    padding: 5px 10px;
+    min-height: 32.2px;
+}
+
+.cus-icon-plus:before,
+.cus-icon-plus:after {
+    content: '';
+    position: absolute;
+    border-radius: 5px;
+    background-color: #fff;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.cus-icon-plus:before {
+    width: 20px;
+    height: 3px;
+}
+
+.cus-icon-plus:after {
+    width: 3px;
+    height: 20px;
+}
+
+.cus-icon-plus:hover {
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.cus-icon-plus:not(.dark):hover::before,
+.cus-icon-plus:not(.dark):hover::after {
+    background-color: #5bc0de;
 }

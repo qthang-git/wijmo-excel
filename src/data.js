@@ -13,6 +13,7 @@ export class DataService {
         this._notes = '';
         this.group = '';
         this._status = 1;
+        this.lorem = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`;
     }
     getData(count) {
         const data = [];
@@ -28,7 +29,7 @@ export class DataService {
         const item = {
             no: index == 0 ? '' : index,
             user: this._user,
-            operation: this._operation,
+            operation: index == 1 ? this.lorem : this._operation,
             tag: this._tag,
             checklist: this._checklist,
             date: this._date,
